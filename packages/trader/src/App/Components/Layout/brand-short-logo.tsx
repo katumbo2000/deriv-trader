@@ -1,9 +1,9 @@
 import React from 'react';
 
+import { BrandDerivLogoCoralIcon } from '@deriv/quill-icons';
 import { getBrandHomeUrl } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 
-import { BrandDerivLogoCoralIcon } from '@deriv/quill-icons';
 import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 
 const BrandShortLogo = observer(() => {
