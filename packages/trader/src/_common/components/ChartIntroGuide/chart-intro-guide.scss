@@ -294,6 +294,10 @@
             margin-bottom: 1.6rem;
             color: #ffffff;
             text-align: left;
+
+            @include rtl {
+                text-align: right;
+            }
         }
 
         .chart-intro-guide__description {
@@ -302,6 +306,10 @@
             color: #ffffff;
             text-align: left;
             line-height: 2.4rem;
+
+            @include rtl {
+                text-align: right;
+            }
         }
 
         .chart-intro-guide__video-container--desktop {
