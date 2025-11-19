@@ -12,8 +12,9 @@ import { useDevice } from '@deriv-com/ui';
 import { routes } from '@deriv/shared';
 import { Localize } from '@deriv-com/translations';
 import BottomNav from 'AppV2/Components/BottomNav';
-import Router from './Routes/router';
+import Router from '../../Routes/router';
 import Sidebar from 'App/Components/Layout/Sidebar/sidebar';
+import './app-shell.scss';
 
 const AppShell = observer(() => {
     const { portfolio, client } = useStore();
@@ -74,11 +75,11 @@ const AppShell = observer(() => {
     const should_show_bottomnav = isMobile && is_logged_in && !window.location.pathname.startsWith('/contract');
 
     return (
-        <React.Fragment>
+        <div className='app-shell'>
             {!isMobile && <Sidebar />}
             <Router />
             {should_show_bottomnav && <BottomNav bottomNavItems={bottomNavItems} />}
-        </React.Fragment>
+        </div>
     );
 });
 

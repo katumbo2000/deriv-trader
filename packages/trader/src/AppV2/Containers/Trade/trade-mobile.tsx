@@ -120,16 +120,16 @@ const Trade = observer(() => {
     }, [current_language, network_status.class]);
 
     return (
-        <div
-            className={clsx('trade', {
-                trade__logout: !is_logged_in,
-            })}
-            onScroll={onScroll}
-            data-testid='dt_trade-mobile'
-        >
+        <div>
             {symbols.length && trade_types.length ? (
                 <React.Fragment>
-                    <div className='trade'>
+                    <div
+                        className={clsx('trade', {
+                            trade__logout: !is_logged_in,
+                        })}
+                        onScroll={onScroll}
+                        data-testid='dt_trade-mobile'
+                    >
                         <TradeTypes
                             contract_type={contract_type}
                             onTradeTypeSelect={onTradeTypeSelect}
@@ -141,9 +141,11 @@ const Trade = observer(() => {
                         <TradeParametersContainer>
                             <TradeParameters />
                         </TradeParametersContainer>
-                        <div className='trade__chart-tooltip'>
+                        <div className='trade-container__chart-tooltip'>
                             <section
-                                className={clsx('trade__chart', { 'trade__chart--with-borderRadius': !is_accumulator })}
+                                className={clsx('trade-container__chart', {
+                                    'trade-container__chart--with-borderRadius': !is_accumulator,
+                                })}
                                 style={{
                                     height: getChartHeight({ is_accumulator, symbol, has_cancellation, contract_type }),
                                 }}
@@ -154,7 +156,11 @@ const Trade = observer(() => {
                         </div>
                         {is_accumulator && <AccumulatorStats />}
                     </div>
-                    <div className={clsx('trade__parameter', { 'trade__parameter--with-button': !is_market_closed })}>
+                    <div
+                        className={clsx('trade-container__parameter', {
+                            'trade-container__parameter--with-button': !is_market_closed,
+                        })}
+                    >
                         <TradeParametersContainer is_minimized_visible={is_minimized_params_visible} is_minimized>
                             <TradeParameters is_minimized />
                         </TradeParametersContainer>

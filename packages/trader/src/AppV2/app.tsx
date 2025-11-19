@@ -12,7 +12,7 @@ import TraderProviders from '../trader-providers';
 
 import ServicesErrorSnackbar from './Components/ServicesErrorSnackbar';
 import Notifications from './Containers/Notifications';
-import AppShell from './app-shell';
+import AppShell from './Containers/AppShell/app-shell';
 
 import 'Sass/app.scss';
 

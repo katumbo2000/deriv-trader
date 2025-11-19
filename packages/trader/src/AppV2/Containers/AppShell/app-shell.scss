@@ -1,0 +1,15 @@
+.app-shell {
+    display: flex;
+
+    @include desktop-screen {
+        flex-direction: row;
+    }
+
+    @include tablet-screen {
+        flex-direction: row;
+    }
+
+    @include mobile-screen {
+        flex-direction: column;
+    }
+}

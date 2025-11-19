@@ -4,44 +4,44 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
     height: calc(100vh - 9.6rem);
+    background-color: var(--semantic-color-slate-solid-surface-frame-mid);
+    padding: 0 var(--core-spacing-400) var(--core-spacing-400);
 
     @include desktop-screen {
-        height: calc(100vh - 8.4rem);
+        height: 100vh;
+        padding: unset;
     }
 
     &__logout {
         height: calc(100vh - 5.6rem);
 
         @include desktop-screen {
-            height: calc(100vh - 8.4rem);
+            height: 100vh;
         }
     }
 
     &-container {
-        display: flex;
-        flex-direction: column;
-        background-color: var(--semantic-color-slate-solid-surface-frame-mid);
-        padding: 0 var(--core-spacing-400) var(--core-spacing-400);
-        gap: var(--core-spacing-400);
-
-        @include desktop-screen {
-            height: 100%;
+        &__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--core-spacing-400);
+            height: 6.5rem;
+            background-color: var(--semantic-color-slate-solid-surface-frame-low);
+            border-bottom: 1px solid var(--semantic-color-monochrome-border-normal-mid);
         }
-
-        &--grid {
+        &__grid {
             display: grid;
             grid-template-columns: 1fr minmax(0, 32rem);
             position: relative;
-            height: 100%;
+            height: calc(100vh - 6.4rem);
         }
-
         &__trade-types {
             position: relative;
-            width: 100vw;
-            inset-inline-start: calc(-1 * var(--core-spacing-400));
-            padding: var(--core-spacing-400) var(--core-spacing-800);
+            width: calc(100vw - 7.2rem - 32rem);
             background-color: var(--semantic-color-slate-solid-surface-frame-low);
             display: flex;
+            align-items: center;
             gap: var(--core-spacing-400);
             overflow-x: auto;
             min-height: var(--core-spacing-1600);
@@ -49,6 +49,12 @@
             scrollbar-width: none;
             scroll-behavior: smooth;
             transition: left var(--core-motion-duration-300) ease-in;
+
+            @include mobile-screen {
+                width: 100vw;
+                inset-inline-start: calc(-1 * var(--core-spacing-400));
+                padding: var(--core-spacing-400) var(--core-spacing-800);
+            }
 
             &::-webkit-scrollbar {
                 display: none;

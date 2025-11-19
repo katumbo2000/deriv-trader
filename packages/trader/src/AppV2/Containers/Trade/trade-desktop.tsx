@@ -19,6 +19,7 @@ import useDefaultSymbol from 'AppV2/Hooks/useDefaultSymbol';
 import AccumulatorStats from 'AppV2/Components/AccumulatorStats';
 import OnboardingGuide from 'AppV2/Components/OnboardingGuide/GuideForPages';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
+import AccountHeader from 'AppV2/Components/AccountHeader';
 
 const TradeDesktop = observer(() => {
     const chart_ref = React.useRef<HTMLDivElement>(null);
@@ -110,35 +111,35 @@ const TradeDesktop = observer(() => {
         >
             {symbols.length && trade_types.length ? (
                 <React.Fragment>
-                    <div className='trade-container'>
+                    <div className='trade-container__header'>
                         <TradeTypes
                             contract_type={contract_type}
                             onTradeTypeSelect={onTradeTypeSelect}
                             trade_types={trade_types}
                             is_dark_mode_on={is_dark_mode_on}
                         />
-                        <div className='trade-container--grid'>
-                            <MarketSelector />
-                            <div className='trade-container__chart-tooltip'>
-                                {isDigitTradeType(contract_type) && <CurrentSpot />}
-                                <section
-                                    className={clsx('trade-container__chart', {
-                                        'trade-container__chart--with-borderRadius': !is_accumulator,
-                                    })}
-                                    style={{
-                                        height: '100%',
-                                    }}
-                                    ref={chart_ref}
-                                >
-                                    <TradeChart />
-                                </section>
-                                {is_accumulator && <AccumulatorStats />}
-                            </div>
-                            <TradeParametersContainer>
-                                <TradeParameters />
-                                {!is_market_closed && <PurchaseButton />}
-                            </TradeParametersContainer>
+                        <AccountHeader />
+                    </div>
+                    <div className='trade-container__grid'>
+                        <div className='trade-container__chart-tooltip'>
+                            {isDigitTradeType(contract_type) && <CurrentSpot />}
+                            <section
+                                className={clsx('trade-container__chart', {
+                                    'trade-container__chart--with-borderRadius': !is_accumulator,
+                                })}
+                                style={{
+                                    height: '100%',
+                                }}
+                                ref={chart_ref}
+                            >
+                                <TradeChart />
+                            </section>
+                            {is_accumulator && <AccumulatorStats />}
                         </div>
+                        <TradeParametersContainer>
+                            <TradeParameters />
+                            {!is_market_closed && <PurchaseButton />}
+                        </TradeParametersContainer>
                     </div>
                     {!guide_dtrader_v2?.trade_page && is_logged_in && <OnboardingGuide type='trade_page' />}
                 </React.Fragment>

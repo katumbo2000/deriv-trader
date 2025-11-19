@@ -3,6 +3,7 @@
     padding-block: var(--core-spacing-400);
     align-items: flex-end;
     height: var(--core-size-2800);
+    border-radius: 32px;
     gap: 0;
 
     &:not(.quill-button:first-child .purchase-button):not(.purchase-button--loading) {
