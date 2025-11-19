@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Text } from '@deriv/components';
 import {
     LegacyHomeNewIcon,
@@ -14,7 +12,7 @@ import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 
 const AccountSelector = observer(() => {
     const { client, common, ui } = useStore();
-    const { logout } = client;
+    const { logout, is_logged_in } = client;
     const { current_language } = common;
     const { closeSidebarFlyout } = ui;
     const { sendBridgeEvent } = useMobileBridge();
@@ -42,13 +40,15 @@ const AccountSelector = observer(() => {
                 <Text>{localize('Go to Home')}</Text>
                 <StandaloneArrowUpRightFromSquareRegularIcon iconSize='sm' fill='var(--color-text-primary)' />
             </Button>
-            <Button
-                className='flyout-selector__option'
-                onClick={handleLogout}
-                icon={<LegacyLogout1pxIcon iconSize='xs' fill='var(--color-text-primary)' />}
-            >
-                <Text>{localize('Log out')}</Text>
-            </Button>
+            {is_logged_in && (
+                <Button
+                    className='flyout-selector__option'
+                    onClick={handleLogout}
+                    icon={<LegacyLogout1pxIcon iconSize='xs' fill='var(--color-text-primary)' />}
+                >
+                    <Text>{localize('Log out')}</Text>
+                </Button>
+            )}
         </div>
     );
 });

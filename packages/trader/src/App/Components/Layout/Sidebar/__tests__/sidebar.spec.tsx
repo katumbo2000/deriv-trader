@@ -1,4 +1,3 @@
-import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 
@@ -27,6 +26,7 @@ jest.mock('@deriv/quill-icons', () => ({
     ...jest.requireActual('@deriv/quill-icons'),
     DerivProductBrandLightDerivTraderLogoIcon: () => 'DerivProductBrandLightDerivTraderLogoIcon',
     LegacyMinimize2pxIcon: () => 'LegacyMinimize2pxIcon',
+    StandaloneCircleUserRegularIcon: () => 'StandaloneCircleUserRegularIcon',
     StandaloneClockThreeRegularIcon: () => 'StandaloneClockThreeRegularIcon',
     StandaloneFileRegularIcon: () => 'StandaloneFileRegularIcon',
     StandaloneGlobeRegularIcon: () => 'StandaloneGlobeRegularIcon',
@@ -35,7 +35,7 @@ jest.mock('@deriv/quill-icons', () => ({
 }));
 
 jest.mock('../language-selector', () => jest.fn(() => <div>LanguageSelector</div>));
-jest.mock('../theme-selector', () => jest.fn(() => <div>ThemeSelector</div>));
+jest.mock('../account-selector', () => jest.fn(() => <div>AccountSelector</div>));
 jest.mock('../../../Elements/PositionsDrawer', () => ({
     PositionsDrawerContent: jest.fn(() => <div>PositionsDrawerContent</div>),
     PositionsDrawerFooter: jest.fn(() => <div>PositionsDrawerFooter</div>),
@@ -100,10 +100,11 @@ describe('<Sidebar />', () => {
         expect(screen.queryByTestId('dt_sidebar_reports')).not.toBeInTheDocument();
     });
 
-    it('should render utility items (theme and language)', () => {
+    it('should render utility items (language, theme, and account)', () => {
         renderSidebar();
-        expect(screen.getByTestId('dt_sidebar_theme')).toBeInTheDocument();
         expect(screen.getByTestId('dt_sidebar_language')).toBeInTheDocument();
+        expect(screen.getByTestId('dt_sidebar_theme')).toBeInTheDocument();
+        expect(screen.getByTestId('dt_sidebar_account')).toBeInTheDocument();
     });
 
     it('should display badge count when there are active positions', () => {
@@ -199,6 +200,53 @@ describe('<Sidebar />', () => {
         });
         renderSidebar(store);
         expect(screen.getByText('LanguageSelector')).toBeInTheDocument();
+    });
+
+    it('should call setSidebarFlyout when account button is clicked', () => {
+        const store = mockStore(defaultStoreConfig);
+        renderSidebar(store);
+        const accountButton = screen.getByTestId('dt_sidebar_account');
+        fireEvent.click(accountButton);
+        expect(store.ui.setSidebarFlyout).toHaveBeenCalledWith('account');
+    });
+
+    it('should toggle account flyout when clicking account button twice', () => {
+        const store = mockStore({
+            ...defaultStoreConfig,
+            ui: {
+                ...defaultStoreConfig.ui,
+                active_sidebar_flyout: 'account',
+            },
+        });
+        renderSidebar(store);
+        const accountButton = screen.getByTestId('dt_sidebar_account');
+        fireEvent.click(accountButton);
+        expect(store.ui.setSidebarFlyout).toHaveBeenCalledWith(null);
+    });
+
+    it('should render account selector in flyout when account is active', () => {
+        const store = mockStore({
+            ...defaultStoreConfig,
+            ui: {
+                ...defaultStoreConfig.ui,
+                active_sidebar_flyout: 'account',
+            },
+        });
+        renderSidebar(store);
+        expect(screen.getByText('AccountSelector')).toBeInTheDocument();
+    });
+
+    it('should mark account button as active when account flyout is open', () => {
+        const store = mockStore({
+            ...defaultStoreConfig,
+            ui: {
+                ...defaultStoreConfig.ui,
+                active_sidebar_flyout: 'account',
+            },
+        });
+        renderSidebar(store);
+        const accountButton = screen.getByTestId('dt_sidebar_account');
+        expect(accountButton).toHaveClass('sidebar__item--active');
     });
 
     it('should render positions drawer in flyout when positions is active', () => {
