@@ -10,7 +10,7 @@ const TradeParamsFooter: React.FC = () => {
         <div className='trade-params-v1-footer'>
             <NetworkStatus />
             <DateTime />
-            <ToggleFullScreen showPopover={false} />
+            <ToggleFullScreen showPopover={true} />
         </div>
     );
 };
