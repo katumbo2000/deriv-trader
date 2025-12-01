@@ -7,14 +7,16 @@ import { getCurrencyDisplayCode } from '@deriv/shared';
 import { SegmentedControlSingleChoice, TextField } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 
+import { InputPopover, ValueChips } from 'AppV2/Components/InputPopover';
 import useTradeError from 'AppV2/Hooks/useTradeError';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 import { TTradeParametersProps } from '../trade-parameters';
 
-import StakeChips from './stake-chips';
 import StakeInputDesktop from './stake-input-desktop';
+
+const STAKE_CHIP_VALUES = [1, 5, 10, 15, 20, 25, 30, 40, 50, 100];
 
 const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
     const {
@@ -33,7 +35,6 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
 
     const [is_open, setIsOpen] = React.useState(false);
     const [active_tab, setActiveTab] = React.useState<'chips' | 'input'>('chips');
-    const [popover_position, setPopoverPosition] = React.useState({ top: 0, left: 0 });
     const stake_field_ref = React.useRef<HTMLDivElement>(null);
 
     const contract_types = getDisplayedContractTypes(trade_types, contract_type, trade_type_tab);
@@ -43,16 +44,6 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
     const should_show_snackbar = contract_types.length === 1 || is_multiplier || is_all_types_with_errors;
 
     const onOpen = React.useCallback(() => {
-        if (stake_field_ref.current) {
-            const rect = stake_field_ref.current.getBoundingClientRect();
-            const popoverWidth = 280;
-            const spacing = 16;
-
-            setPopoverPosition({
-                top: rect.top,
-                left: rect.left - popoverWidth - spacing,
-            });
-        }
         setIsOpen(true);
     }, []);
 
@@ -99,39 +90,29 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
                     status={has_error && should_show_snackbar ? 'error' : 'neutral'}
                 />
             </div>
-            {is_open && (
-                <div className='stake-popover-overlay' onClick={onClose}>
-                    <div
-                        className='stake-popover'
-                        onClick={e => e.stopPropagation()}
-                        style={{
-                            top: `${popover_position.top}px`,
-                            left: `${popover_position.left}px`,
-                        }}
-                    >
-                        <div className='stake-popover__header'>
-                            <SegmentedControlSingleChoice
-                                hasContainerWidth
-                                onChange={handleTabChange}
-                                options={tab_options}
-                                selectedItemIndex={active_tab === 'chips' ? 0 : 1}
-                                size='sm'
-                            />
-                        </div>
-                        <div className='stake-popover__content'>
-                            {active_tab === 'chips' ? (
-                                <StakeChips
-                                    currency={currency}
-                                    onChipSelect={handleChipSelect}
-                                    selected_amount={amount}
-                                />
-                            ) : (
-                                <StakeInputDesktop onClose={onClose} is_open={is_open} />
-                            )}
-                        </div>
-                    </div>
+            <InputPopover isOpen={is_open} onClose={onClose} triggerRef={stake_field_ref} className='stake-popover'>
+                <div className='stake-popover__header'>
+                    <SegmentedControlSingleChoice
+                        hasContainerWidth
+                        onChange={handleTabChange}
+                        options={tab_options}
+                        selectedItemIndex={active_tab === 'chips' ? 0 : 1}
+                        size='sm'
+                    />
                 </div>
-            )}
+                <div className='stake-popover__content'>
+                    {active_tab === 'chips' ? (
+                        <ValueChips
+                            values={STAKE_CHIP_VALUES}
+                            selectedValue={amount}
+                            onSelect={handleChipSelect}
+                            formatValue={val => `${val} ${getCurrencyDisplayCode(currency)}`}
+                        />
+                    ) : (
+                        <StakeInputDesktop onClose={onClose} is_open={is_open} />
+                    )}
+                </div>
+            </InputPopover>
         </React.Fragment>
     );
 });
