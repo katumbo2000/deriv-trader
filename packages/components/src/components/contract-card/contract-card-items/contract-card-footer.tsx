@@ -54,6 +54,10 @@ const CardFooter = ({
     const should_show_sell = hasContractEntered(contract_info) && isOpen(contract_info);
     const should_show_sell_note = is_lookbacks && isValidToSell(contract_info) && should_show_sell;
 
+    if (!should_show_sell) {
+        return null;
+    }
+
     const footer_content = (
         <div className='dc-contract-card-item__footer'>
             {is_multiplier ? (

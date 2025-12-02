@@ -61,6 +61,14 @@ const PositionsDrawerCardItem = ({
     }, [portfolio_position?.contract_info.is_sold, measure, portfolio_position?.id]);
 
     React.useEffect(() => {
+        // Trigger measure when contract enters (entry_spot becomes available)
+        // This ensures the grid recalculates height when footer appears
+        if (portfolio_position?.contract_info?.entry_spot && measure) {
+            measure();
+        }
+    }, [portfolio_position?.contract_info?.entry_spot, measure]);
+
+    React.useEffect(() => {
         // Only remove positions that have actually ended (sold/expired)
         // Use getEndTime to properly determine if a contract has ended
         const contract_info = portfolio_position?.contract_info;
