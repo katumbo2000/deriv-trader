@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
 import { Text, TextField } from '@deriv-com/quill-ui';
-import { Localize } from '@deriv-com/translations';
+import { Localize, localize } from '@deriv-com/translations';
 
 import { useTraderStore } from 'Stores/useTraderStores';
 
@@ -78,19 +78,30 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
     );
 
     const formatTickValue = useCallback((value: number) => {
-        return `${value} ${value === 1 ? 'tick' : 'ticks'}`;
+        return localize('{{count}} {{tick_label}}', {
+            count: value,
+            tick_label: value === 1 ? localize('tick') : localize('ticks'),
+        });
     }, []);
 
     const formatSecondsValue = useCallback((value: number) => {
-        return `${value} ${value === 1 ? 'second' : 'seconds'}`;
+        return localize('{{count}} {{second_label}}', {
+            count: value,
+            second_label: value === 1 ? localize('second') : localize('seconds'),
+        });
     }, []);
 
     const formatMinutesValue = useCallback((value: number) => {
-        return `${value} ${value === 1 ? 'minute' : 'minutes'}`;
+        return localize('{{count}} {{minute_label}}', {
+            count: value,
+            minute_label: value === 1 ? localize('minute') : localize('minutes'),
+        });
     }, []);
 
     const formatHoursValue = useCallback((value: number) => {
-        return `${value} hr`;
+        return localize('{{count}} hr', {
+            count: value,
+        });
     }, []);
 
     const getDisplayValue = useCallback(() => {
@@ -107,11 +118,19 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
 
             // If it's a whole hour value (no remainder), display as hours
             if (minutes === 0 && hours > 0) {
-                return `${hours} hr`;
+                return localize('{{count}} {{hour_label}}', {
+                    count: hours,
+                    hour_label: hours === 1 ? localize('hour') : localize('hours'),
+                });
             }
             // If it has both hours and minutes
             if (hours > 0 && minutes > 0) {
-                return `${hours} hr ${minutes} min`;
+                return localize('{{hours_count}} {{hour_label}} {{minutes_count}} {{minute_label}}', {
+                    hours_count: hours,
+                    hour_label: hours === 1 ? localize('hour') : localize('hours'),
+                    minutes_count: minutes,
+                    minute_label: minutes === 1 ? localize('minute') : localize('minutes'),
+                });
             }
             // Otherwise display as minutes
             return formatMinutesValue(duration);
