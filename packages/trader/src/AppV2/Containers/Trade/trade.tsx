@@ -158,7 +158,7 @@ const Trade = observer(() => {
                         {!is_market_closed && <PurchaseButton />}
                     </div>
                     {/* TODO: Remove isBridgeAvailable check when onboarding video with Accumulators is available*/}
-                    {!guide_dtrader_v2?.trade_page && is_logged_in && !isBridgeAvailable() && (
+                    {!guide_dtrader_v2?.trade_page && is_logged_in && !isBridgeAvailable && (
                         <OnboardingGuide type='trade_page' is_dark_mode_on={is_dark_mode_on} />
                     )}
                 </React.Fragment>

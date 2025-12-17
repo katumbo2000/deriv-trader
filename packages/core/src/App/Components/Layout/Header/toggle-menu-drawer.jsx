@@ -214,7 +214,7 @@ const ToggleMenuDrawer = observer(() => {
                     <div className='header__menu-mobile-body-wrapper'>
                         <React.Fragment>
                             <MobileDrawer.Body>
-                                {!isBridgeAvailable() && (
+                                {!isBridgeAvailable && (
                                     <MobileDrawer.Item onClick={handleHomeClick}>
                                         <MenuLink icon={<LegacyHomeOldIcon />} text={localize('Home')} />
                                     </MobileDrawer.Item>
@@ -271,7 +271,7 @@ const ToggleMenuDrawer = observer(() => {
                                     >
                                         <MenuLink
                                             icon={<LegacyLogout1pxIcon />}
-                                            text={isBridgeAvailable() ? localize('Back to app') : localize('Log out')}
+                                            text={isBridgeAvailable ? localize('Back to app') : localize('Log out')}
                                         />
                                     </MobileDrawer.Item>
                                 )}

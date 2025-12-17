@@ -50,7 +50,6 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
     const [is_open, setIsOpen] = React.useState<boolean>(false);
     const [is_editing, setIsEditing] = React.useState<boolean>(false);
     const trade_types_ref = React.useRef<HTMLDivElement>(null);
-    const is_bridge_available = isBridgeAvailable();
 
     const createArrayFromCategories = (data: TTradeTypesProps['trade_types']): TItem[] => {
         const result: TItem[] = [];
@@ -277,7 +276,7 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                     <Text size='sm'>{title}</Text>
                 </Chip.Selectable>
             ))}
-            {should_show_view_all && !is_bridge_available && (
+            {should_show_view_all && !isBridgeAvailable && (
                 <Button
                     key='trade-types-all'
                     onClick={handleOpenActionSheet}

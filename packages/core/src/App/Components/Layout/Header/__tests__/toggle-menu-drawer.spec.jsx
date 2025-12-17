@@ -6,6 +6,8 @@ import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { useMobileBridge } from 'App/Hooks/useMobileBridge';
+
 import ToggleMenuDrawer from '../toggle-menu-drawer';
 
 // Mock all the problematic imports
@@ -89,15 +91,13 @@ jest.mock('@deriv/shared', () => ({
 }));
 
 const mockSendBridgeEvent = jest.fn().mockResolvedValue(true);
-const mockIsBridgeAvailable = jest.fn(() => false);
-const mockUseMobileBridge = jest.fn(() => ({
-    sendBridgeEvent: mockSendBridgeEvent,
-    isBridgeAvailable: mockIsBridgeAvailable,
-    isDesktop: false,
-}));
 
 jest.mock('App/Hooks/useMobileBridge', () => ({
-    useMobileBridge: () => mockUseMobileBridge(),
+    useMobileBridge: jest.fn(() => ({
+        sendBridgeEvent: mockSendBridgeEvent,
+        isBridgeAvailable: false,
+        isDesktop: false,
+    })),
 }));
 
 // Mock the ToggleMenu components
@@ -206,14 +206,11 @@ describe('<ToggleMenuDrawer />', () => {
         jest.clearAllMocks();
         // Reset useMobileBridge mock to default values
         mockSendBridgeEvent.mockClear().mockResolvedValue(true);
-        mockIsBridgeAvailable.mockReturnValue(false);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
+            isBridgeAvailable: false,
             isDesktop: false,
         });
-        // Clear DerivAppChannel from window
-        delete window.DerivAppChannel;
     });
 
     it('should clear timeout after component was unmount', () => {
@@ -230,11 +227,9 @@ describe('<ToggleMenuDrawer />', () => {
         const user = userEvent.setup({ delay: null });
         // Mock bridge available
         mockSendBridgeEvent.mockResolvedValue(true);
-        mockIsBridgeAvailable.mockReturnValue(true);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
-            isDesktop: false,
+            isBridgeAvailable: true,
         });
 
         render(mockToggleMenuDrawer());
@@ -262,11 +257,9 @@ describe('<ToggleMenuDrawer />', () => {
                 await fallback(); // Execute fallback
             }
         });
-        mockIsBridgeAvailable.mockReturnValue(false);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
-            isDesktop: false,
+            isBridgeAvailable: false,
         });
 
         render(mockToggleMenuDrawer());
@@ -289,32 +282,32 @@ describe('<ToggleMenuDrawer />', () => {
 
     it('should show "Back to app" text when bridge is available', () => {
         // Mock bridge available
-        mockIsBridgeAvailable.mockReturnValue(true);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
+            isBridgeAvailable: true,
             isDesktop: false,
         });
 
         render(mockToggleMenuDrawer());
 
         // The component should use "Back to app" text when bridge is available
-        expect(mockIsBridgeAvailable()).toBe(true);
+        const { isBridgeAvailable } = useMobileBridge();
+        expect(isBridgeAvailable).toBe(true);
     });
 
     it('should show "Log out" text when bridge is not available', () => {
         // Mock bridge not available
-        mockIsBridgeAvailable.mockReturnValue(false);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
+            isBridgeAvailable: false,
             isDesktop: false,
         });
 
         render(mockToggleMenuDrawer());
 
         // The component should use "Log out" text when bridge is not available
-        expect(mockIsBridgeAvailable()).toBe(false);
+        const { isBridgeAvailable } = useMobileBridge();
+        expect(isBridgeAvailable).toBe(false);
     });
 
     it('should always show hamburger icon', () => {
@@ -345,11 +338,9 @@ describe('<ToggleMenuDrawer />', () => {
                 await fallback(); // Execute fallback on error
             }
         });
-        mockIsBridgeAvailable.mockReturnValue(false);
-        mockUseMobileBridge.mockReturnValue({
+        useMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: mockIsBridgeAvailable,
-            isDesktop: false,
+            isBridgeAvailable: false,
         });
 
         render(mockToggleMenuDrawer());
@@ -503,38 +494,30 @@ describe('<ToggleMenuDrawer />', () => {
         it('should hide Home button when bridge is available', async () => {
             const user = userEvent.setup({ delay: null });
             // Mock bridge available
-            mockIsBridgeAvailable.mockReturnValue(true);
-            mockUseMobileBridge.mockReturnValue({
+            useMobileBridge.mockReturnValue({
                 sendBridgeEvent: mockSendBridgeEvent,
-                isBridgeAvailable: mockIsBridgeAvailable,
-                isDesktop: false,
+                isBridgeAvailable: true,
             });
 
             render(mockToggleMenuDrawer());
             const hamburgerButton = screen.getByTestId('dt_mobile_drawer_toggle');
             await user.click(hamburgerButton);
 
-            const homeItems = screen.queryAllByTestId('drawer-item');
-            const homeItem = homeItems.find(item => item.textContent?.includes('Home'));
-
             // Home button should not be present when bridge is available
-            expect(homeItem).toBeUndefined();
+            expect(screen.queryByText('Home')).not.toBeInTheDocument();
         });
 
         it('should show Home button when bridge is not available', async () => {
             const user = userEvent.setup({ delay: null });
             // Mock bridge not available
-            mockIsBridgeAvailable.mockReturnValue(false);
-            mockUseMobileBridge.mockReturnValue({
+            useMobileBridge.mockReturnValue({
                 sendBridgeEvent: mockSendBridgeEvent,
-                isBridgeAvailable: mockIsBridgeAvailable,
-                isDesktop: false,
+                isBridgeAvailable: false,
             });
 
             render(mockToggleMenuDrawer());
             const hamburgerButton = screen.getByTestId('dt_mobile_drawer_toggle');
             await user.click(hamburgerButton);
-
             const homeItems = screen.getAllByTestId('drawer-item');
             const homeItem = homeItems.find(item => item.textContent?.includes('Home'));
 
