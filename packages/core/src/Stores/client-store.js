@@ -309,6 +309,9 @@ export default class ClientStore extends BaseStore {
     };
 
     async init() {
+        // Remove any legacy token parameters from URL
+        this.removeTokenFromUrl();
+
         // Set up auth error handler for WebSocket code 1006 errors
         BinarySocket.setOnAuthError(error => {
             this.root_store.common.setError(true, {
@@ -683,5 +686,13 @@ export default class ClientStore extends BaseStore {
     setLogout(is_logged_out) {
         this.has_logged_out = is_logged_out;
         if (this.root_store.common.has_error) this.root_store.common.setError(false, null);
+    }
+
+    removeTokenFromUrl() {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('token')) {
+            url.searchParams.delete('token');
+            window.history.replaceState({}, document.title, url.toString());
+        }
     }
 }
