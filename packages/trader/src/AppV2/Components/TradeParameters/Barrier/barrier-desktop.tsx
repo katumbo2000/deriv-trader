@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
@@ -16,11 +16,19 @@ interface BarrierDesktopProps {
     is_minimized?: boolean;
 }
 
+const getBarrierType = (barrier: string): string => {
+    if (!barrier) return 'above_spot';
+    if (barrier.startsWith('+')) return 'above_spot';
+    if (barrier.startsWith('-')) return 'below_spot';
+    return 'fixed_barrier';
+};
+
 const BarrierDesktop: React.FC<BarrierDesktopProps> = observer(({ is_minimized }) => {
     const { barrier_1, is_market_closed } = useTraderStore();
 
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-    const [selectedType, setSelectedType] = useState('above_spot');
+    const initialType = useMemo(() => getBarrierType(barrier_1), [barrier_1]);
+    const [selectedType, setSelectedType] = useState(initialType);
     const inputRef = useRef<HTMLDivElement>(null);
 
     const handleOpenPopover = useCallback(() => {

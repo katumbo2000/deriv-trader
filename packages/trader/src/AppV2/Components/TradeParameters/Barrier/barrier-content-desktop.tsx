@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Button, CaptionText, TextField, TextFieldAddon } from '@deriv-com/quill-ui';
+import { Button, TextField, TextFieldAddon } from '@deriv-com/quill-ui';
 import { Localize, localize } from '@deriv-com/translations';
 
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -35,23 +35,16 @@ const BarrierContentDesktop: React.FC<BarrierContentDesktopProps> = observer(({ 
         onClose();
     };
 
-    const handleOnChange = (e: { target: { name: string; value: string } }) => {
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
-
     return (
         <div className='barrier-content'>
             <div className='barrier-content__spot'>
-                <span
-                    style={{ fontSize: '1.4rem', fontWeight: 400, color: 'var(--component-textIcon-normal-default)' }}
-                >
+                <span className='barrier-content__spot-label'>
                     <Localize i18n_default_text='Current spot' />
                 </span>
-                <span
-                    style={{ fontSize: '1.4rem', fontWeight: 400, color: 'var(--component-textIcon-normal-default)' }}
-                >
-                    {quote || '0.0000'}
-                </span>
+                <span className='barrier-content__spot-value'>{quote ?? '0.0000'}</span>
             </div>
 
             <div className='barrier-content__input'>

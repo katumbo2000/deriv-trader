@@ -10,6 +10,17 @@
         align-items: center;
     }
 
+    &__spot-label {
+        font-size: 1.4rem;
+        color: var(--component-textIcon-normal-default);
+    }
+
+    &__spot-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--component-textIcon-normal-prominent);
+    }
+
     &__input {
         flex: 1;
     }

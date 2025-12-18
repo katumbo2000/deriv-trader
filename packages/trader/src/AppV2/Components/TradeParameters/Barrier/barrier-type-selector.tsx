@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+
+import { localize } from '@deriv-com/translations';
 
 import type { VerticalTabItem } from '../../InputPopover/vertical-tab-selector';
 import VerticalTabSelector from '../../InputPopover/vertical-tab-selector';
@@ -9,13 +11,16 @@ interface BarrierTypeSelectorProps {
     className?: string;
 }
 
-const BARRIER_TYPES: VerticalTabItem[] = [
-    { value: 'above_spot', label: 'Above spot' },
-    { value: 'below_spot', label: 'Below spot' },
-    { value: 'fixed_barrier', label: 'Fixed barrier' },
-];
-
 const BarrierTypeSelector: React.FC<BarrierTypeSelectorProps> = ({ selectedType, onSelectType, className }) => {
+    const BARRIER_TYPES: VerticalTabItem[] = useMemo(
+        () => [
+            { value: 'above_spot', label: localize('Above spot') },
+            { value: 'below_spot', label: localize('Below spot') },
+            { value: 'fixed_barrier', label: localize('Fixed barrier') },
+        ],
+        []
+    );
+
     return (
         <VerticalTabSelector
             items={BARRIER_TYPES}
