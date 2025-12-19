@@ -448,10 +448,8 @@ export default class ClientStore extends BaseStore {
             }, 200);
         }
 
-        // Check whoami once on init
-        this.handleWhoAmI();
-
         // Set up visibility change listener to check whoami when tab becomes visible
+        // Note: Initial whoami check is now done at the start of init() before WebSocket connection
         this.setupVisibilityListener();
 
         return true;
