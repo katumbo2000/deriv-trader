@@ -3,7 +3,7 @@ import { LegacyLogout1pxIcon } from '@deriv/quill-icons';
 import { observer, useStore } from '@deriv/stores';
 import { localize } from '@deriv-com/translations';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
+import { useMobileBridge } from '@deriv/api';
 
 const AccountSelector = observer(() => {
     const { client, ui } = useStore();

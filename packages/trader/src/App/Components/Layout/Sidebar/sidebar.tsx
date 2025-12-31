@@ -20,7 +20,7 @@ import { getBrandUrl, routes } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { Localize, localize, useTranslations } from '@deriv-com/translations';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
+import { useMobileBridge } from '@deriv/api';
 
 import { PositionsDrawerContent, PositionsDrawerFooter } from '../../Elements/PositionsDrawer';
 

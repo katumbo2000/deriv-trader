@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
 
-import { useRemoteConfig } from '@deriv/api';
-
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
+import { useRemoteConfig, useMobileBridge } from '@deriv/api';
 
 /**
  * Shared hook that provides native app allowed trade types from remote config.

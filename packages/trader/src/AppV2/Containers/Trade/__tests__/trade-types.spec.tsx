@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { useMobileBridge } from '@deriv/api';
 import { mockStore } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { getTradeTypesList, sortCategoriesInTradeTypeOrder } from 'AppV2/Utils/trade-types-utils';
 
 import TraderProviders from '../../../../trader-providers';
@@ -14,7 +14,8 @@ jest.mock('AppV2/Utils/trade-types-utils');
 
 jest.mock('AppV2/Components/Guide', () => jest.fn(() => <div>MockedGuide</div>));
 
-jest.mock('App/Hooks/useMobileBridge', () => ({
+jest.mock('@deriv/api', () => ({
+    ...jest.requireActual('@deriv/api'),
     useMobileBridge: jest.fn(() => ({
         isBridgeAvailable: false,
     })),

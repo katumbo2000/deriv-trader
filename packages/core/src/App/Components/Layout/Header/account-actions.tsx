@@ -1,7 +1,8 @@
 import React from 'react';
+import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
-import { useDerivativesAccount } from '@deriv/api';
+import { useDerivativesAccount, useMobileBridge } from '@deriv/api';
 import { Button, Skeleton, Text } from '@deriv/components';
 import { getBrandUrl, trackAnalyticsEvent } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
@@ -10,7 +11,6 @@ import { useTranslations } from '@deriv-com/translations';
 import { LoginButton } from './login-button';
 
 import 'Sass/app/_common/components/account-switcher.scss';
-import classNames from 'classnames';
 
 const AccountInfo = React.lazy(
     () =>
@@ -24,6 +24,7 @@ const AccountActionsComponent = observer(() => {
     const { currency, is_logged_in, loginid } = client;
 
     const { localize } = useTranslations();
+    const { sendBridgeEvent } = useMobileBridge();
 
     // Fetch derivatives accounts to determine button type (single source of truth)
     const { data, isLoading, error, refetch } = useDerivativesAccount(loginid, is_logged_in);
@@ -54,7 +55,9 @@ const AccountActionsComponent = observer(() => {
             // Transfer button (for both account types or real-only accounts)
             const brandUrl = getBrandUrl();
             const lang_param = common.current_language ? `&lang=${common.current_language}` : '';
-            window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+            sendBridgeEvent('trading:transfer', () => {
+                window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+            });
         }
     };
 

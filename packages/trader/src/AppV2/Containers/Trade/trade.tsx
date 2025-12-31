@@ -2,12 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
-import { useLocalStorageData } from '@deriv/api';
+import { useLocalStorageData, useMobileBridge } from '@deriv/api';
 import { Loading } from '@deriv/components';
 import { getSymbolDisplayName, trackAnalyticsEvent } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import AccumulatorStats from 'AppV2/Components/AccumulatorStats';
 import BottomNav from 'AppV2/Components/BottomNav';
 import ClosedMarketMessage from 'AppV2/Components/ClosedMarketMessage';

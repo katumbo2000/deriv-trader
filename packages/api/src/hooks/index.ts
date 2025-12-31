@@ -4,3 +4,4 @@ export { default as useIsRtl } from './useIsRtl';
 export { default as useIntercom, useIsIntercomAvailable } from './useIntercom';
 export { default as useLocalStorageData } from './useLocalStorageData';
 export { useDerivativesAccount } from './useDerivativesAccount';
+export { useMobileBridge } from './useMobileBridge';

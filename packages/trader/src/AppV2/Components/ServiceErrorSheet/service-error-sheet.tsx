@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { useMobileBridge } from '@deriv/api';
 import { getBrandUrl, isEmptyObject, mapErrorMessage, redirectToLogin, redirectToSignUp } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { ActionSheet } from '@deriv-com/quill-ui';
@@ -16,6 +17,7 @@ const ServiceErrorSheet = observer(() => {
     const { is_virtual, currency } = client;
     const { services_error, resetServicesError, current_language } = common;
     const { clearPurchaseInfo, requestProposal: resetPurchase } = useTraderStore();
+    const { sendBridgeEvent } = useMobileBridge();
 
     const { code, type } = services_error || {};
 
@@ -57,7 +59,9 @@ const ServiceErrorSheet = observer(() => {
                         resetServicesError();
                         const brandUrl = getBrandUrl();
                         const lang_param = current_language ? `&lang=${current_language}` : '';
-                        window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                        sendBridgeEvent('trading:transfer', () => {
+                            window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                        });
                     },
                 },
             };

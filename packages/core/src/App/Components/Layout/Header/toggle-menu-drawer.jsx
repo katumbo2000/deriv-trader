@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
-import { useRemoteConfig } from '@deriv/api';
+import { useRemoteConfig, useMobileBridge } from '@deriv/api';
 import { Div100vhContainer, MobileDrawer, ToggleSwitch } from '@deriv/components';
 import {
     LegacyChartsIcon,
@@ -26,7 +26,6 @@ import WhatsApp from 'App/Components/Elements/WhatsApp';
 import NetworkStatus from 'App/Components/Layout/Footer';
 import getRoutesConfig from 'App/Constants/routes-config';
 import ServerTime from 'App/Containers/server-time.jsx';
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 
 import { MenuTitle, MobileLanguageMenu } from './Components/ToggleMenu';
 import MenuLink from './menu-link';

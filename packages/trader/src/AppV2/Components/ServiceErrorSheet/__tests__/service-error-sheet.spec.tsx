@@ -23,6 +23,21 @@ jest.mock('@deriv/shared', () => ({
     getBrandUrl: jest.fn(() => 'https://home.deriv.com/dashboard'),
 }));
 
+// Mock useMobileBridge hook
+const mockSendBridgeEvent = jest.fn(async (_event, fallback) => {
+    // Execute fallback to simulate browser behavior
+    if (fallback) await fallback();
+    return true;
+});
+
+jest.mock('@deriv/api', () => ({
+    ...jest.requireActual('@deriv/api'),
+    useMobileBridge: () => ({
+        sendBridgeEvent: mockSendBridgeEvent,
+        isBridgeAvailable: false,
+    }),
+}));
+
 // Mock window.location.href
 delete (window as any).location;
 window.location = { href: '' } as any;
@@ -32,6 +47,8 @@ describe('ServiceErrorSheet', () => {
 
     const history = createMemoryHistory();
     beforeEach(() => {
+        jest.clearAllMocks();
+        mockSendBridgeEvent.mockClear();
         default_mock_store = mockStore({
             client: { is_logged_in: true, is_virtual: false, currency: 'USD' },
             common: {
@@ -114,5 +131,38 @@ describe('ServiceErrorSheet', () => {
 
         await userEvent.click(okButton);
         expect(default_mock_store.common.resetServicesError).toHaveBeenCalled();
+    });
+
+    describe('Bridge events', () => {
+        it('should call sendBridgeEvent with trading:transfer when "Transfer now" is clicked', async () => {
+            render(mockTrade());
+
+            const depositButton = screen.getByText(/transfer now/i);
+            await userEvent.click(depositButton);
+
+            expect(mockSendBridgeEvent).toHaveBeenCalledWith('trading:transfer', expect.any(Function));
+        });
+
+        it('should not call sendBridgeEvent when "OK" button is clicked for virtual accounts', async () => {
+            default_mock_store.client.is_virtual = true;
+            render(mockTrade());
+
+            const okButton = screen.getByText(/ok/i);
+            await userEvent.click(okButton);
+
+            expect(mockSendBridgeEvent).not.toHaveBeenCalled();
+        });
+
+        it('should execute fallback (redirect) when bridge is not available', async () => {
+            window.location.href = '';
+            render(mockTrade());
+
+            const depositButton = screen.getByText(/transfer now/i);
+            await userEvent.click(depositButton);
+
+            // Since mockSendBridgeEvent executes the fallback, window.location should be set
+            expect(window.location.href).toContain('home.deriv.com/dashboard/transfer');
+            expect(window.location.href).toContain('curr=USD');
+        });
     });
 });

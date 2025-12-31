@@ -1,7 +1,5 @@
-import { useRemoteConfig } from '@deriv/api';
+import { useRemoteConfig, useMobileBridge } from '@deriv/api';
 import { renderHook } from '@testing-library/react-hooks';
-
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 
 import useNativeAppAllowedTradeTypes from '../useNativeAppAllowedTradeTypes';
 
@@ -16,9 +14,6 @@ jest.mock('@deriv/api', () => ({
             },
         },
     })),
-}));
-
-jest.mock('App/Hooks/useMobileBridge', () => ({
     useMobileBridge: jest.fn(() => ({
         isBridgeAvailable: false,
     })),

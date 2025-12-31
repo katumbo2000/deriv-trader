@@ -1,7 +1,7 @@
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
+import { useMobileBridge } from '@deriv/api';
 
 import AccountSelector from '../account-selector';
 
@@ -9,7 +9,8 @@ jest.mock('@deriv-com/translations', () => ({
     localize: (key: string) => key,
 }));
 
-jest.mock('App/Hooks/useMobileBridge', () => ({
+jest.mock('@deriv/api', () => ({
+    ...jest.requireActual('@deriv/api'),
     useMobileBridge: jest.fn(),
 }));
 

@@ -10,7 +10,7 @@ const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {
 
 interface TestResult {
     sendBridgeEvent?: (
-        event: 'trading:back' | 'trading:home',
+        event: 'trading:back' | 'trading:home' | 'trading:transfer' | 'trading:account_creation',
         fallback?: () => void | Promise<void>
     ) => Promise<boolean>;
     isBridgeAvailable?: boolean;
@@ -70,6 +70,40 @@ const TestComponent = ({ onResult }: { onResult: (result: TestResult) => void })
                 },
             },
             'Test Send With Fallback'
+        ),
+        React.createElement(
+            'button',
+            {
+                'data-testid': 'test-send-transfer',
+                onClick: async () => {
+                    const result = await hookResult.sendBridgeEvent('trading:transfer');
+                    onResult({ sendResult: result });
+                },
+            },
+            'Test Send Transfer'
+        ),
+        React.createElement(
+            'button',
+            {
+                'data-testid': 'test-send-account-creation',
+                onClick: async () => {
+                    const result = await hookResult.sendBridgeEvent('trading:account_creation');
+                    onResult({ sendResult: result });
+                },
+            },
+            'Test Send Account Creation'
+        ),
+        React.createElement(
+            'button',
+            {
+                'data-testid': 'test-send-transfer-with-fallback',
+                onClick: async () => {
+                    const mockFallback = jest.fn();
+                    const result = await hookResult.sendBridgeEvent('trading:transfer', mockFallback);
+                    onResult({ sendResult: result, fallbackCalled: mockFallback.mock.calls.length });
+                },
+            },
+            'Test Send Transfer With Fallback'
         )
     );
 };
@@ -273,6 +307,94 @@ describe('useMobileBridge', () => {
             await userEvent.click(button);
 
             expect(testResult.sendResult).toBe(false);
+            expect(mockPostMessage).toHaveBeenCalled();
+            expect(mockConsoleError).toHaveBeenCalledWith('Failed to send bridge message:', expect.any(Error));
+        });
+
+        it('should send trading:transfer event when bridge is available', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            const mockPostMessage = jest.fn();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            const button = screen.getByTestId('test-send-transfer');
+            await userEvent.click(button);
+
+            expect(testResult.sendResult).toBe(true);
+            expect(mockPostMessage).toHaveBeenCalledWith(JSON.stringify({ event: 'trading:transfer' }));
+        });
+
+        it('should send trading:account_creation event when bridge is available', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            const mockPostMessage = jest.fn();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            const button = screen.getByTestId('test-send-account-creation');
+            await userEvent.click(button);
+
+            expect(testResult.sendResult).toBe(true);
+            expect(mockPostMessage).toHaveBeenCalledWith(JSON.stringify({ event: 'trading:account_creation' }));
+        });
+
+        it('should execute fallback for trading:transfer when bridge is not available', async () => {
+            // No DerivAppChannel
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            // Wait for initial render
+            await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+            const button = screen.getByTestId('test-send-transfer-with-fallback');
+            await userEvent.click(button);
+
+            // Wait for async operation to complete
+            await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+            expect(testResult.sendResult).toBe(true);
+            expect(testResult.fallbackCalled).toBe(1);
+        });
+
+        it('should handle trading:transfer with fallback on bridge error', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            const mockPostMessage = jest.fn(() => {
+                throw new Error('Bridge error');
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            // Wait for initial render
+            await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+            const button = screen.getByTestId('test-send-transfer-with-fallback');
+            await userEvent.click(button);
+
+            // Wait for async operation to complete
+            await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+            expect(testResult.sendResult).toBe(true);
+            expect(testResult.fallbackCalled).toBe(1);
             expect(mockPostMessage).toHaveBeenCalled();
             expect(mockConsoleError).toHaveBeenCalledWith('Failed to send bridge message:', expect.any(Error));
         });

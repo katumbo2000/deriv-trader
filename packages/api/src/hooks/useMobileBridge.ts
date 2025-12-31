@@ -29,7 +29,10 @@ export const useMobileBridge = () => {
     const isBridgeAvailable = isMobileApp;
 
     const sendBridgeEvent = useCallback(
-        async (event: 'trading:back' | 'trading:home', fallback?: () => void | Promise<void>) => {
+        async (
+            event: 'trading:back' | 'trading:home' | 'trading:transfer' | 'trading:account_creation',
+            fallback?: () => void | Promise<void>
+        ) => {
             try {
                 if (isBridgeAvailable && window.DerivAppChannel?.postMessage) {
                     const message: DerivAppChannelMessage = { event };

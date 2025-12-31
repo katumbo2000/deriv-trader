@@ -14,7 +14,8 @@ jest.mock('@deriv/shared', () => ({
     getBrandUrl: jest.fn(() => 'https://deriv.com'),
 }));
 
-jest.mock('App/Hooks/useMobileBridge', () => ({
+jest.mock('@deriv/api', () => ({
+    ...jest.requireActual('@deriv/api'),
     useMobileBridge: jest.fn(() => ({
         sendBridgeEvent: jest.fn((_event, callback) => callback()),
     })),

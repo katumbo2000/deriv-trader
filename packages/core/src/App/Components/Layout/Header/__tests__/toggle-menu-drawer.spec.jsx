@@ -1,12 +1,10 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
-import { APIProvider } from '@deriv/api';
+import { APIProvider, useMobileBridge } from '@deriv/api';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 
 import ToggleMenuDrawer from '../toggle-menu-drawer';
 
@@ -93,11 +91,19 @@ jest.mock('@deriv/shared', () => ({
 
 const mockSendBridgeEvent = jest.fn().mockResolvedValue(true);
 
-jest.mock('App/Hooks/useMobileBridge', () => ({
+// Mock @deriv/api with both useMobileBridge and useRemoteConfig
+jest.mock('@deriv/api', () => ({
+    ...jest.requireActual('@deriv/api'),
     useMobileBridge: jest.fn(() => ({
         sendBridgeEvent: mockSendBridgeEvent,
         isBridgeAvailable: false,
         isDesktop: false,
+    })),
+    useRemoteConfig: jest.fn(() => ({
+        data: {
+            cs_chat_intercom: true,
+            cs_chat_whatsapp: true,
+        },
     })),
 }));
 
@@ -157,17 +163,6 @@ jest.mock('App/Constants/routes-config', () => {
 jest.mock('App/Containers/server-time.jsx', () => {
     return jest.fn(() => <div data-testid='server-time'>Server Time</div>);
 });
-
-// Mock useRemoteConfig
-jest.mock('@deriv/api', () => ({
-    ...jest.requireActual('@deriv/api'),
-    useRemoteConfig: jest.fn(() => ({
-        data: {
-            cs_chat_intercom: true,
-            cs_chat_whatsapp: true,
-        },
-    })),
-}));
 
 describe('<ToggleMenuDrawer />', () => {
     const mockLogout = jest.fn().mockResolvedValue();

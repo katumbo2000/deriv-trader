@@ -14,7 +14,7 @@ declare global {
         navigator: Navigator;
     }
     interface DerivAppChannelMessage {
-        event: 'trading:back' | 'trading:home';
+        event: 'trading:back' | 'trading:home' | 'trading:transfer' | 'trading:account_creation';
         // Add other event types as needed
     }
     interface DerivAppChannel {

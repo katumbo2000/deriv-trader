@@ -2,13 +2,12 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import { useLocalStorageData } from '@deriv/api';
+import { useLocalStorageData, useMobileBridge } from '@deriv/api';
 import { getPositionsV2TabIndexFromURL } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Tab } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import BottomNav from 'AppV2/Components/BottomNav';
 import OnboardingGuide from 'AppV2/Components/OnboardingGuide/GuideForPages';
 import { setPositionURLParams, TAB_NAME } from 'AppV2/Utils/positions-utils';
