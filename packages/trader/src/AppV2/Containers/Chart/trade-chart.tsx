@@ -22,8 +22,6 @@ import { useSmartChartsAdapter } from 'Modules/SmartChart/Hooks/useSmartChartsAd
 import { CHART_CONSTANTS, getMarketsOrder } from 'Modules/SmartChart/Utils/chart-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
 
-import ChartIntroGuide from '_common/components/ChartIntroGuide';
-
 type TickSpotData = NonNullable<TTicksStreamResponse['tick']>;
 
 type TBottomWidgetsParams = {
