@@ -219,6 +219,7 @@ const TradeChart = observer(() => {
     return (
         <>
             <SmartChart
+                key={show_digits_stats ? symbol : 'trade-chart'}
                 drawingToolFloatingMenuPosition={
                     isMobile
                         ? CHART_CONSTANTS.MOBILE_DRAWING_TOOL_POSITION
