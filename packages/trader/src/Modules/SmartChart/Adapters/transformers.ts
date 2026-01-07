@@ -202,7 +202,7 @@ export const MARKET_MAPPINGS = {
 
     SUBMARKET_DISPLAY_NAMES: new Map([
         // Derived submarkets
-        ['random_index', 'Continuous Indices'],
+        ['random_index', 'Volatility Indices'],
         ['random_daily', 'Daily Reset Indices'],
         ['crash_index', 'Crash/Boom'],
         ['jump_index', 'Jump Indices'],

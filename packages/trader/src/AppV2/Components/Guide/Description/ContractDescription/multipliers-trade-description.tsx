@@ -121,7 +121,7 @@ const MultipliersTradeDescription = ({ onTermClick }: { onTermClick: (term: stri
         {
             type: 'paragraph',
             text: (
-                <Localize i18n_default_text='Note: Deal cancellation is only available for Volatility Indices on Multipliers.' />
+                <Localize i18n_default_text='Note: Deal cancellation is only available for Volatility indices on Multipliers.' />
             ),
         },
     ];

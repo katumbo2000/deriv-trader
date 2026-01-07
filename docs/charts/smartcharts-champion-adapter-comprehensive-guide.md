@@ -1177,7 +1177,7 @@ export const mockActiveSymbols = [
         market: 'synthetic_index',
         market_display_name: 'Synthetic Indices',
         submarket: 'random_index',
-        submarket_display_name: 'Continuous Indices',
+        submarket_display_name: 'Volatility Indices',
         symbol_type: 'stockindex',
         pip: 0.01,
         exchange_is_open: 1,

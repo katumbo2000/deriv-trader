@@ -16,7 +16,7 @@ jest.mock('AppV2/Utils/symbol-categories-utils', () => ({
     getSubmarketDisplayName: jest.fn((submarket: string) => {
         const mappings: Record<string, string> = {
             major_pairs: 'Major Pairs',
-            random_index: 'Continuous Indices',
+            random_index: 'Volatility Indices',
             crash_index: 'Crash/Boom',
             minor_pairs: 'Minor Pairs',
             exotic_pairs: 'Exotic Pairs',
@@ -43,7 +43,7 @@ describe('SmartChart Adapters - Transformers', () => {
 
             // Test specific mappings
             expect(MARKET_MAPPINGS.SUBMARKET_DISPLAY_NAMES.get('major_pairs')).toBe('Major Pairs');
-            expect(MARKET_MAPPINGS.SUBMARKET_DISPLAY_NAMES.get('random_index')).toBe('Continuous Indices');
+            expect(MARKET_MAPPINGS.SUBMARKET_DISPLAY_NAMES.get('random_index')).toBe('Volatility Indices');
             expect(MARKET_MAPPINGS.SUBMARKET_DISPLAY_NAMES.get('crash_index')).toBe('Crash/Boom');
         });
     });
@@ -84,7 +84,7 @@ describe('SmartChart Adapters - Transformers', () => {
                     name: 'Derived',
                     submarkets: [
                         {
-                            name: 'Continuous Indices',
+                            name: 'Volatility Indices',
                             symbols: [
                                 {
                                     underlying_symbol: 'R_10',
@@ -125,7 +125,7 @@ describe('SmartChart Adapters - Transformers', () => {
             const result = enrichActiveSymbols(mockActiveSymbols, mockTradingTimes);
 
             expect(result[0]).toHaveProperty('submarket_display_name', 'Major Pairs');
-            expect(result[1]).toHaveProperty('submarket_display_name', 'Continuous Indices');
+            expect(result[1]).toHaveProperty('submarket_display_name', 'Volatility Indices');
         });
 
         it('should handle symbols with underlying_symbol but no symbol property', () => {
@@ -252,7 +252,7 @@ describe('SmartChart Adapters - Transformers', () => {
             expect(result[0]).toHaveProperty('submarket_display_name', 'Major Pairs');
             expect(result[1]).toHaveProperty('symbol', 'R_10');
             expect(result[1]).toHaveProperty('market_display_name', 'Derived');
-            expect(result[1]).toHaveProperty('submarket_display_name', 'Continuous Indices');
+            expect(result[1]).toHaveProperty('submarket_display_name', 'Volatility Indices');
 
             consoleSpy.mockRestore();
         });
