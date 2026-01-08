@@ -1,6 +1,8 @@
 import FIREBASE_INIT_DATA from '@deriv/api/src/remote_config.json';
 import { Analytics } from '@deriv-com/analytics';
+
 import initDatadog from 'Utils/Datadog';
+
 import { FeatureFlags, isFeatureFlags } from '../../types/feature-flags';
 
 /**
@@ -35,11 +37,26 @@ export const AnalyticsInitializer = async () => {
 
     const flags = await fetchRemoteConfig(process.env.REMOTE_CONFIG_URL);
 
-    // Initialize RudderStack if enabled
-    if (process.env.RUDDERSTACK_KEY && flags.tracking_rudderstack) {
-        const config = {
-            rudderstackKey: process.env.RUDDERSTACK_KEY,
+    // Initialize RudderStack and/or PostHog based on feature flags
+    // Note: posthogKey and posthogHost are supported in @deriv-com/analytics v1.33.0+
+    const hasRudderStack = !!(process.env.RUDDERSTACK_KEY && flags.tracking_rudderstack);
+    const hasPostHog = !!(process.env.POSTHOG_KEY && flags.tracking_posthog);
+
+    // RudderStack key is required by the Analytics package
+    if (hasRudderStack) {
+        const config: {
+            rudderstackKey: string;
+            posthogKey?: string;
+            posthogHost?: string;
+        } = {
+            rudderstackKey: process.env.RUDDERSTACK_KEY!,
         };
+
+        if (hasPostHog) {
+            config.posthogKey = process.env.POSTHOG_KEY;
+            config.posthogHost = process.env.POSTHOG_HOST;
+        }
+
         await Analytics?.initialise(config);
     }
 
