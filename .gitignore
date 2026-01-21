@@ -46,3 +46,4 @@ cline_instructions.md
 # AI Tool Configuration Files
 .roo-config.json
 .ai-rules.md
+.shiftai-commit-data.json
