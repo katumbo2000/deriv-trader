@@ -105,6 +105,11 @@ const TradeChart = observer(() => {
 
     const { current_spot, current_spot_time } = accumulator_barriers_data || {};
 
+    const topWidgets = React.useCallback(
+        () => <TopWidgets onSymbolChange={symbol => onChange({ target: { name: 'symbol', value: symbol } })} />,
+        [onChange]
+    );
+
     // Use centralized SmartCharts adapter hook
     const { chartData, isLoading, error, getQuotes, subscribeQuotes, unsubscribeQuotes, retryFetchChartData } =
         useSmartChartsAdapter({
@@ -250,7 +255,7 @@ const TradeChart = observer(() => {
                 stateChangeListener={chartStateChange}
                 symbol={symbol}
                 // Enable chart native TopWidgets for desktop, keep hidden for mobile
-                topWidgets={isMobile ? () => <div /> : TopWidgets}
+                topWidgets={isMobile ? () => <div /> : topWidgets}
                 isConnectionOpened={is_socket_opened}
                 clearChart={false}
                 toolbarWidget={() => {
