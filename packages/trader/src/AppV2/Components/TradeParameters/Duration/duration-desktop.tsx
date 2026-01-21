@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import moment from 'moment';
 
 import { Text } from '@deriv-com/quill-ui';
 import { Localize, localize } from '@deriv-com/translations';
@@ -21,6 +22,14 @@ import DurationUnitSelector from './duration-unit-selector';
 interface DurationDesktopProps {
     is_minimized?: boolean;
 }
+
+type DurationConfig = {
+    chipValues: number[] | string[];
+    selectedValue: number | string;
+    onSelect: (value: number | string) => void;
+    formatValue: (value: number | string) => string;
+    inputComponent: React.ReactNode;
+};
 
 const DurationPopoverContent: React.FC<{
     selectedUnit: string;
@@ -92,56 +101,47 @@ const DurationPopoverContent: React.FC<{
     );
 
     const getDurationConfig = useCallback(() => {
-        const configs: Record<
-            string,
-            {
-                chipValues: any[];
-                selectedValue: any;
-                onSelect: any;
-                formatValue: any;
-                inputComponent: React.ReactNode;
-            } | null
-        > = {
+        const configs: Record<string, DurationConfig | null> = {
             t: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.ticks,
                 selectedValue: selectedDuration,
-                onSelect: handleDurationSelectAndClose,
-                formatValue: formatTickValue,
+                onSelect: handleDurationSelectAndClose as (value: number | string) => void,
+                formatValue: formatTickValue as (value: number | string) => string,
                 inputComponent: <DurationTicksInputDesktop onClose={closePopover} />,
             },
             s: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.seconds,
                 selectedValue: selectedDuration,
-                onSelect: handleDurationSelectAndClose,
-                formatValue: formatSecondsValue,
+                onSelect: handleDurationSelectAndClose as (value: number | string) => void,
+                formatValue: formatSecondsValue as (value: number | string) => string,
                 inputComponent: <DurationInputDesktop unit='s' onClose={closePopover} />,
             },
             m: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.minutes,
                 selectedValue: selectedDuration,
-                onSelect: handleDurationSelectAndClose,
-                formatValue: formatMinutesValue,
+                onSelect: handleDurationSelectAndClose as (value: number | string) => void,
+                formatValue: formatMinutesValue as (value: number | string) => string,
                 inputComponent: <DurationInputDesktop unit='m' onClose={closePopover} />,
             },
             h: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.hours,
                 selectedValue: Math.floor(selectedDuration / 60),
-                onSelect: handleHourSelectAndClose,
-                formatValue: formatHoursValue,
+                onSelect: handleHourSelectAndClose as (value: number | string) => void,
+                formatValue: formatHoursValue as (value: number | string) => string,
                 inputComponent: <DurationHoursInputDesktop onClose={closePopover} />,
             },
             end_time: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.endTime,
                 selectedValue: TRADE_PARAMETER_PRESETS.duration.endTime[0],
-                onSelect: handleEndTimeSelectAndClose,
-                formatValue: formatEndTimeValue,
+                onSelect: handleEndTimeSelectAndClose as (value: number | string) => void,
+                formatValue: formatEndTimeValue as (value: number | string) => string,
                 inputComponent: <DurationEndTimeDesktop onClose={closePopover} />,
             },
             end_date: {
                 chipValues: TRADE_PARAMETER_PRESETS.duration.endDate,
                 selectedValue: selectedDuration,
-                onSelect: handleEndDateSelectAndClose,
-                formatValue: formatEndDateValue,
+                onSelect: handleEndDateSelectAndClose as (value: number | string) => void,
+                formatValue: formatEndDateValue as (value: number | string) => string,
                 inputComponent: <DurationEndDateDesktop onClose={closePopover} />,
             },
         };
@@ -193,10 +193,10 @@ const DurationPopoverContent: React.FC<{
                         ) : (
                             <ChipsWithInputToggle
                                 activeTab={activeTab}
-                                chipValues={config.chipValues}
-                                selectedValue={config.selectedValue}
-                                onSelect={config.onSelect}
-                                formatValue={config.formatValue}
+                                chipValues={config.chipValues as number[]}
+                                selectedValue={config.selectedValue as number}
+                                onSelect={config.onSelect as (value: number) => void}
+                                formatValue={config.formatValue as (value: number) => string}
                                 inputComponent={config.inputComponent}
                             />
                         )
@@ -214,7 +214,16 @@ const DurationPopoverContent: React.FC<{
 };
 
 const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized }) => {
-    const { duration, duration_unit, duration_units_list, onChangeMultiple, is_market_closed } = useTraderStore();
+    const {
+        duration,
+        duration_unit,
+        duration_units_list,
+        onChangeMultiple,
+        is_market_closed,
+        expiry_type,
+        expiry_time,
+        expiry_date,
+    } = useTraderStore();
 
     const availableUnits = React.useMemo(() => {
         const units = duration_units_list.map(unit => unit.value);
@@ -361,6 +370,20 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
     );
 
     const getDisplayValue = useCallback(() => {
+        if (expiry_type === 'endtime') {
+            if (expiry_time && expiry_date) {
+                const date = moment(expiry_date);
+                const formattedDate = date.format('D MMM');
+                const formattedTime = expiry_time.substring(0, 5);
+                return `${formattedDate}, ${formattedTime}`;
+            }
+            if (expiry_date) {
+                const date = moment(expiry_date);
+                const formattedDate = date.format('D MMM');
+                return formattedDate;
+            }
+        }
+
         if (duration_unit === 't') {
             return formatTickValue(duration);
         }
@@ -392,7 +415,16 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
             return formatMinutesValue(duration);
         }
         return `${duration} ${duration_unit}`;
-    }, [duration, duration_unit, formatTickValue, formatSecondsValue, formatMinutesValue]);
+    }, [
+        duration,
+        duration_unit,
+        expiry_type,
+        expiry_time,
+        expiry_date,
+        formatTickValue,
+        formatSecondsValue,
+        formatMinutesValue,
+    ]);
 
     return (
         <TradeParameterPopover

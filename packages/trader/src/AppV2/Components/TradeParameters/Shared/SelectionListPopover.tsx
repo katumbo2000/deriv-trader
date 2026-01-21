@@ -32,7 +32,7 @@ const SelectionListPopover = <T extends string | number>({
     );
 
     return (
-        <div className={`${className}__content`}>
+        <div className={`${className}__content`} role='listbox' aria-label='Selection options'>
             {options.map(({ value, label }) => {
                 const isSelected = value === selectedValue;
 
@@ -40,6 +40,8 @@ const SelectionListPopover = <T extends string | number>({
                     <button
                         key={String(value)}
                         type='button'
+                        role='option'
+                        aria-selected={isSelected}
                         className={clsx(`${className}__option`, {
                             [`${className}__option--selected`]: isSelected,
                         })}

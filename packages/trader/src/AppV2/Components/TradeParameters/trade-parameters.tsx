@@ -50,7 +50,6 @@ const TradeParameters = observer(({ is_minimized }: TTradeParametersProps) => {
                 is_minimized && 'trade-params__options-wrapper--minimized'
             )}
         >
-            {isVisible('allow_equals') && <AllowEquals />}
             <div
                 ref={scroll_container_ref}
                 className={clsx(
@@ -76,6 +75,7 @@ const TradeParameters = observer(({ is_minimized }: TTradeParametersProps) => {
             {isVisible('payout_per_point_info') && <PayoutPerPointInfo />}
             {isVisible('expiration') && <MultipliersExpirationInfo />}
             {isVisible('mult_info_display') && <MultipliersDealCancellationInfo is_minimized={is_minimized} />}
+            {isVisible('allow_equals') && <AllowEquals />}
         </div>
     );
 });

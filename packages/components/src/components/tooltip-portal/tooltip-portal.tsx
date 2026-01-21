@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
+import debounce from 'lodash.debounce';
 
 // Tooltip positioning constants
 const TOOLTIP_OFFSET = 12; // Distance between tooltip and trigger in pixels
@@ -111,18 +112,21 @@ const TooltipPortal = ({ message, children, className, position = 'top', anchorR
         }
     }, [position, anchorRef]);
 
+    const debouncedCalculatePosition = React.useMemo(() => debounce(calculatePosition, 100), [calculatePosition]);
+
     useEffect(() => {
         if (isVisible) {
             calculatePosition();
-            window.addEventListener('scroll', calculatePosition);
-            window.addEventListener('resize', calculatePosition);
+            window.addEventListener('scroll', debouncedCalculatePosition);
+            window.addEventListener('resize', debouncedCalculatePosition);
 
             return () => {
-                window.removeEventListener('scroll', calculatePosition);
-                window.removeEventListener('resize', calculatePosition);
+                window.removeEventListener('scroll', debouncedCalculatePosition);
+                window.removeEventListener('resize', debouncedCalculatePosition);
+                debouncedCalculatePosition.cancel();
             };
         }
-    }, [isVisible, calculatePosition]);
+    }, [isVisible, calculatePosition, debouncedCalculatePosition]);
 
     const handleMouseEnter = React.useCallback(() => {
         setIsVisible(true);

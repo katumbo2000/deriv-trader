@@ -38,7 +38,12 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
 
     const handleTimeClick = useCallback(() => {
         setIsPickerOpen(true);
-    }, []);
+        // Reset date to today when opening the time picker
+        const todayDate = moment().format('YYYY-MM-DD');
+        onChangeMultiple({
+            expiry_date: todayDate,
+        });
+    }, [onChangeMultiple]);
 
     const handleTimeChange = useCallback((time: string) => {
         setSelectedTime(time);
@@ -49,22 +54,23 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
     }, []);
 
     const handleSave = useCallback(() => {
+        const todayDate = moment().format('YYYY-MM-DD');
         onChangeMultiple({
             expiry_type: 'endtime',
             expiry_time: selectedTime,
-            expiry_date: expiry_date || moment().format('YYYY-MM-DD'),
+            expiry_date: todayDate,
         });
         onClose();
-    }, [selectedTime, expiry_date, onChangeMultiple, onClose]);
+    }, [selectedTime, onChangeMultiple, onClose]);
 
     // Calculate expiry date message
     const getExpiryMessage = useCallback(() => {
-        const expiryMoment = moment(expiry_date || moment().format('YYYY-MM-DD'));
-        const formattedDate = expiryMoment.format('Do MMM');
+        const todayMoment = moment();
+        const formattedDate = todayMoment.format('Do MMM');
         return localize('Contract will expire on {{formatted_date}} at the selected time GMT.', {
             formatted_date: formattedDate,
         });
-    }, [expiry_date, localize]);
+    }, [localize]);
 
     return (
         <div className='duration-input-desktop__wrapper'>

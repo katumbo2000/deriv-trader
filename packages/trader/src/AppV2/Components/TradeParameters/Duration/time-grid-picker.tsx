@@ -20,7 +20,6 @@ const TimeGridPicker: React.FC<TimeGridPickerProps> = ({ selectedTime, onTimeCha
     // Generate minutes array with 5-minute intervals (00, 05, 10, ..., 55)
     const minutes = useMemo(() => Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0')), []);
 
-    // Check if a time is valid based on market hours
     const isTimeValid = useCallback(
         (hour: string, minute: string) => {
             if (!startTimes || !endTimes || startTimes.length === 0 || endTimes.length === 0) {
@@ -41,20 +40,16 @@ const TimeGridPicker: React.FC<TimeGridPickerProps> = ({ selectedTime, onTimeCha
 
     const handleHourClick = useCallback(
         (hour: string) => {
-            if (isTimeValid(hour, selectedMinute)) {
-                onTimeChange(`${hour}:${selectedMinute}`);
-            }
+            onTimeChange(`${hour}:${selectedMinute}`);
         },
-        [selectedMinute, onTimeChange, isTimeValid]
+        [selectedMinute, onTimeChange]
     );
 
     const handleMinuteClick = useCallback(
         (minute: string) => {
-            if (isTimeValid(selectedHour, minute)) {
-                onTimeChange(`${selectedHour}:${minute}`);
-            }
+            onTimeChange(`${selectedHour}:${minute}`);
         },
-        [selectedHour, onTimeChange, isTimeValid]
+        [selectedHour, onTimeChange]
     );
 
     return (
@@ -68,16 +63,19 @@ const TimeGridPicker: React.FC<TimeGridPickerProps> = ({ selectedTime, onTimeCha
                         const isValid = isTimeValid(hour, selectedMinute);
                         const isSelected = hour === selectedHour;
                         return (
-                            <div
+                            <button
                                 key={hour}
+                                type='button'
                                 className={classNames('time-grid-picker__item', {
                                     'time-grid-picker__item--selected': isSelected,
                                     'time-grid-picker__item--disabled': !isValid,
                                 })}
-                                onClick={() => isValid && handleHourClick(hour)}
+                                onClick={() => handleHourClick(hour)}
+                                disabled={!isValid}
+                                aria-label={`Hour ${hour}`}
                             >
                                 {hour}
-                            </div>
+                            </button>
                         );
                     })}
                 </div>
@@ -91,16 +89,19 @@ const TimeGridPicker: React.FC<TimeGridPickerProps> = ({ selectedTime, onTimeCha
                         const isValid = isTimeValid(selectedHour, minute);
                         const isSelected = minute === selectedMinute;
                         return (
-                            <div
+                            <button
                                 key={minute}
+                                type='button'
                                 className={classNames('time-grid-picker__item', {
                                     'time-grid-picker__item--selected': isSelected,
                                     'time-grid-picker__item--disabled': !isValid,
                                 })}
-                                onClick={() => isValid && handleMinuteClick(minute)}
+                                onClick={() => handleMinuteClick(minute)}
+                                disabled={!isValid}
+                                aria-label={`Minute ${minute}`}
                             >
                                 {minute}
-                            </div>
+                            </button>
                         );
                     })}
                 </div>
