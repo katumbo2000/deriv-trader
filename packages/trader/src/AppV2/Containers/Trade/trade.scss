@@ -11,12 +11,25 @@
         flex-direction: column;
         height: 100vh;
         width: calc(100vw - 7.2rem);
+        padding-left: 0;
+        transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-sizing: border-box;
 
         @include mobile-screen {
             height: unset;
             width: unset;
             padding: 0 var(--core-spacing-400) var(--core-spacing-400);
             gap: var(--core-spacing-400);
+        }
+
+        &--flyout-open {
+            @include desktop-screen {
+                padding-left: 30.4rem;
+            }
+
+            @include tablet-screen {
+                padding-left: 30.4rem;
+            }
         }
 
         &__header {
@@ -60,9 +73,11 @@
             position: relative;
             height: calc(100vh - 6.4rem);
         }
+
         &__trade-types {
             position: relative;
             width: calc(100vw - 7.2rem - 28rem);
+            padding-right: 5.6rem;
             background-color: var(--semantic-color-slate-solid-surface-frame-low);
             display: flex;
             align-items: center;
@@ -72,7 +87,6 @@
             white-space: nowrap;
             scrollbar-width: none;
             scroll-behavior: smooth;
-            transition: left var(--core-motion-duration-300) ease-in;
 
             @include mobile-screen {
                 width: 100vw;

@@ -17,4 +17,13 @@
         flex-direction: column;
         height: 100%;
     }
+
+    &__main-content {
+        flex: 1;
+        min-width: 0;
+
+        @include mobile-screen {
+            margin-left: 0;
+        }
+    }
 }

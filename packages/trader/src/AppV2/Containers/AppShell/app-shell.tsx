@@ -1,5 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
+import classNames from 'classnames';
 import { useStore } from '@deriv/stores';
 import {
     StandaloneChartAreaFillIcon,
@@ -17,9 +18,10 @@ import Sidebar from 'App/Components/Layout/Sidebar/sidebar';
 import './app-shell.scss';
 
 const AppShell = observer(() => {
-    const { portfolio, client } = useStore();
+    const { portfolio, client, ui } = useStore();
     const { is_logged_in } = client;
     const { active_positions_count } = portfolio;
+    const { active_sidebar_flyout } = ui;
     const { isMobile } = useDevice();
 
     const bottomNavItems = [

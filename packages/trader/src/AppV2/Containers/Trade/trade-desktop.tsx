@@ -31,7 +31,7 @@ const TradeDesktop = observer(() => {
     const {
         client,
         common: { current_language, network_status },
-        ui: { is_dark_mode_on },
+        ui: { is_dark_mode_on, active_sidebar_flyout },
     } = useStore();
     const { is_logged_in } = client;
     const {
@@ -107,6 +107,7 @@ const TradeDesktop = observer(() => {
         <div
             className={clsx('trade-container-v2', {
                 'trade-container-v2__logout': !is_logged_in,
+                'trade-container-v2--flyout-open': active_sidebar_flyout !== null,
             })}
         >
             {symbols.length && trade_types.length ? (
