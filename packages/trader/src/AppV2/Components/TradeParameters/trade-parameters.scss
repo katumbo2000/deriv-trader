@@ -163,7 +163,9 @@
                 &:last-child.selected {
                     span,
                     .quill-typography {
-                        color: var(--component-button-bg-sell-primary-default) !important; // Sell button red (brighter)
+                        color: var(
+                            --color-trade-sell-text
+                        ) !important; // Brighter red/pink (#FF4D6E) for better visibility
                         font-weight: 700 !important; // Bold font weight
                     }
                 }

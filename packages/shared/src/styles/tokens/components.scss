@@ -32,6 +32,7 @@
         --color-trade-buy-bg: #{darken($color-success, 10%)}; // Buy background (derived from brand-secondary to get #3d9494)
         --color-trade-sell: #{$color-danger}; // Sell/Lower/Fall trades
         --color-trade-sell-bg: #{darken($color-danger, 10%)}; // Sell background (derived from brand-danger)
+        --color-trade-sell-text: #ff4d6e; // Brighter red/pink for sell button text in segmented controls
         --color-trade-disabled: var(--color-interactive-disabled);
 
         // Form Colors
@@ -128,6 +129,7 @@
         --color-trade-buy-bg: #{darken($color-success, 10%)}; // Buy background (derived from brand-secondary to get #3d9494)
         --color-trade-sell: #{$color-danger}; // Sell/Lower/Fall trades (dark)
         --color-trade-sell-bg: #{darken($color-danger, 10%)}; // Sell background (derived from brand-danger)
+        --color-trade-sell-text: #ff4d6e; // Brighter red/pink for sell button text in segmented controls
         --color-trade-disabled: var(--color-interactive-disabled);
 
         // Form Colors
