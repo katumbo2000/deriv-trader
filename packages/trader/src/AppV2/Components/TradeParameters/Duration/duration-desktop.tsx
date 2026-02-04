@@ -68,6 +68,18 @@ const DurationPopoverContent: React.FC<{
 }) => {
     const { closePopover } = useTradeParameterPopover();
 
+    // Safety check: If config is null, automatically switch to a valid unit
+    React.useEffect(() => {
+        const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+        if (!validUnits.includes(selectedUnit)) {
+            // Find first valid unit from available units
+            const firstValid = availableUnits.find(unit => validUnits.includes(unit));
+            if (firstValid && firstValid !== selectedUnit) {
+                onUnitSelect(firstValid);
+            }
+        }
+    }, [selectedUnit, availableUnits, onUnitSelect]);
+
     const handleDurationSelectAndClose = useCallback(
         (value: number) => {
             onDurationSelect(value);
@@ -99,6 +111,12 @@ const DurationPopoverContent: React.FC<{
         },
         [onEndDateSelect, closePopover]
     );
+
+    // Helper function to check if a unit has a valid config
+    const hasValidConfig = useCallback((unit: string): boolean => {
+        const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+        return validUnits.includes(unit);
+    }, []);
 
     const config = useMemo(() => {
         const configs: Record<string, DurationConfig | null> = {
@@ -227,52 +245,131 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         const units = duration_units_list.map(unit => unit.value);
         // Add end_time and end_date for contracts that support them
         // (they're expiry types, not duration units, so they're not in duration_units_list)
-        // Only add them if the contract has more than just ticks (digit contracts only have ticks)
-        const hasOnlyTicks = units.length === 1 && units[0] === 't';
-        if (!hasOnlyTicks) {
+        // Match mobile behavior: only show end_time/end_date when duration_units_list.length > 1
+        // This ensures forex markets (or any market with only 1 duration unit) don't show end time option
+        // HOWEVER: If the current state is using end_time or end_date, we must include them
+        // regardless of duration_units_list.length to avoid breaking the modal
+        const show_end_time = duration_units_list.length > 1;
+        const is_currently_using_end_time = expiry_type === 'endtime' && expiry_time && !expiry_date;
+        const is_currently_using_end_date = expiry_type === 'endtime' && expiry_date;
+        // Special case: 'd' (days) is a duration_unit that represents end_date
+        const is_currently_using_days = duration_unit === 'd';
+
+        // Add end_time only when appropriate (NOT when using days)
+        if ((show_end_time || is_currently_using_end_time) && !is_currently_using_days) {
             if (!units.includes('end_time')) {
                 units.push('end_time');
             }
+        }
+
+        // Add end_date when using end_date expiry type OR when using days duration unit
+        if (show_end_time || is_currently_using_end_date || is_currently_using_days) {
             if (!units.includes('end_date')) {
                 units.push('end_date');
             }
         }
         return units;
-    }, [duration_units_list]);
+    }, [duration_units_list, expiry_type, expiry_time, expiry_date, duration_unit]);
 
     const popoverWidth = React.useMemo(() => {
         // Use narrower width for single-unit contracts (like digit contracts)
         return availableUnits.length === 1 ? 280 : 360;
     }, [availableUnits]);
 
-    const [selectedUnit, setSelectedUnit] = useState('t'); // Default to Ticks
+    // Initialize selectedUnit based on current duration_unit or first available unit
+    // If duration_unit is an expiry type (like 'endtime'), default to first available unit
+    // [AI]
+    // Helper function to get the first valid unit from available units
+    const getFirstValidUnit = React.useCallback((units: string[]): string => {
+        const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+        const firstValid = units.find(unit => validUnits.includes(unit));
+        return firstValid || 't'; // Fallback to 't' if no valid unit found
+    }, []);
+
+    const getInitialUnit = React.useCallback(() => {
+        // Special case: 'd' (days) maps to 'end_date'
+        if (duration_unit === 'd') {
+            return 'end_date';
+        }
+        // Check if current duration_unit is in available units AND has a valid config
+        if (availableUnits.includes(duration_unit)) {
+            const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+            if (validUnits.includes(duration_unit)) {
+                return duration_unit;
+            }
+        }
+        // If expiry_type is 'endtime', check if we should use end_time or end_date
+        if (expiry_type === 'endtime') {
+            if (expiry_time && !expiry_date) {
+                return 'end_time';
+            }
+            if (expiry_date) {
+                return 'end_date';
+            }
+        }
+        // Default to first valid unit from available units
+        return getFirstValidUnit(availableUnits);
+    }, [duration_unit, expiry_type, expiry_time, expiry_date, availableUnits, getFirstValidUnit]);
+
+    const [selectedUnit, setSelectedUnit] = useState(() => getInitialUnit());
+    // [/AI]
     const [selectedDuration, setSelectedDuration] = useState(duration);
     const [activeTab, setActiveTab] = useState<'chips' | 'input'>('chips');
 
     const handleOpenPopover = useCallback(() => {
-        setSelectedUnit(
-            duration_unit === 's'
-                ? 's'
-                : duration_unit === 'm'
-                  ? 'm'
-                  : duration_unit === 'h'
-                    ? 'h'
-                    : duration_unit === 'end_time'
-                      ? 'end_time'
-                      : 't'
-        );
+        // Use the same logic as getInitialUnit to determine which unit to show
+        let unitToShow = duration_unit;
+        const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+
+        // Special case: 'd' (days) maps to 'end_date'
+        if (duration_unit === 'd') {
+            unitToShow = 'end_date';
+        }
+        // If duration_unit is not in available units (e.g., it's an expiry type)
+        else if (!availableUnits.includes(duration_unit)) {
+            // If expiry_type is 'endtime', check if we should use end_time or end_date
+            if (expiry_type === 'endtime') {
+                if (expiry_time && !expiry_date) {
+                    unitToShow = 'end_time';
+                } else if (expiry_date) {
+                    unitToShow = 'end_date';
+                }
+            } else {
+                // Default to first valid unit from available units
+                unitToShow = getFirstValidUnit(availableUnits);
+            }
+        } else if (!validUnits.includes(duration_unit)) {
+            // If duration_unit is in available units but doesn't have a valid config
+            unitToShow = getFirstValidUnit(availableUnits);
+        }
+
+        setSelectedUnit(unitToShow);
         setSelectedDuration(duration);
         setActiveTab('chips'); // Always start with chips tab
-    }, [duration, duration_unit]);
+    }, [duration, duration_unit, expiry_type, expiry_time, expiry_date, availableUnits, getFirstValidUnit]);
 
     const handleClosePopover = useCallback(() => {
         setActiveTab('chips'); // Reset to chips tab on close
     }, []);
 
-    const handleUnitSelect = useCallback((unit: string) => {
-        setSelectedUnit(unit);
-        setActiveTab('chips'); // Reset to chips tab when changing units
-    }, []);
+    const handleUnitSelect = useCallback(
+        (unit: string) => {
+            // Validate that the selected unit has a valid config
+            const validUnits = ['t', 's', 'm', 'h', 'end_time', 'end_date'];
+
+            if (validUnits.includes(unit)) {
+                // Unit has a valid config, proceed with selection
+                setSelectedUnit(unit);
+                setActiveTab('chips'); // Reset to chips tab when changing units
+            } else {
+                // Unit doesn't have a valid config, fallback to first valid unit
+                const fallbackUnit = getFirstValidUnit(availableUnits);
+                setSelectedUnit(fallbackUnit);
+                setActiveTab('chips');
+            }
+        },
+        [availableUnits, getFirstValidUnit]
+    );
 
     const handleTabChange = useCallback((tab: 'chips' | 'input') => {
         setActiveTab(tab);
@@ -411,6 +508,16 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
             }
             // Otherwise display as minutes
             return formatMinutesValue(duration);
+        }
+        if (duration_unit === 'd') {
+            // Calculate expiry date by adding duration days to current date
+            const expiryDate = moment().add(duration, 'days');
+            // Set time to 23:59 (end of day)
+            expiryDate.set({ hour: 23, minute: 59 });
+            // Format as "D MMM, HH:MM" (e.g., "6 Feb, 23:59")
+            const formattedDate = expiryDate.format('D MMM');
+            const formattedTime = expiryDate.format('HH:mm');
+            return `${formattedDate}, ${formattedTime}`;
         }
         return `${duration} ${duration_unit}`;
     }, [

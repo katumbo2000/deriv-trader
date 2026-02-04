@@ -16,11 +16,23 @@ interface DurationEndDateDesktopProps {
 
 const DurationEndDateDesktop: React.FC<DurationEndDateDesktopProps> = observer(({ onClose }) => {
     const { localize } = useTranslations();
-    const { expiry_date, duration_min_max, onChangeMultiple } = useTraderStore();
+    const { expiry_date, duration_unit, duration, duration_min_max, onChangeMultiple } = useTraderStore();
 
-    const [selectedDate, setSelectedDate] = useState<Date>(
-        expiry_date ? moment(expiry_date).toDate() : moment().add(1, 'day').toDate()
-    );
+    // Calculate initial date based on duration_unit and duration
+    const getInitialDate = () => {
+        // If duration_unit is 'd' (days) and duration exists, calculate from duration
+        if (duration_unit === 'd' && duration) {
+            return moment().add(duration, 'days').toDate();
+        }
+        // Otherwise, use expiry_date if available
+        if (expiry_date) {
+            return moment(expiry_date).toDate();
+        }
+        // Default to tomorrow
+        return moment().add(1, 'day').toDate();
+    };
+
+    const [selectedDate, setSelectedDate] = useState<Date>(getInitialDate());
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const field_ref = useRef<HTMLDivElement>(null);
 
