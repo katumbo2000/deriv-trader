@@ -14,9 +14,7 @@ import 'Sass/app/_common/components/account-switcher.scss';
 
 const AccountInfo = React.lazy(
     () =>
-        import(
-            /* webpackChunkName: "account-info", webpackPreload: true */ 'App/Components/Layout/Header/account-info.jsx'
-        )
+        import(/* webpackChunkName: "account-info", webpackPreload: true */ 'App/Components/Layout/Header/account-info')
 );
 
 const AccountActionsComponent = observer(() => {
@@ -69,7 +67,7 @@ const AccountActionsComponent = observer(() => {
             const brandUrl = getBrandUrl();
             const lang_param = common.current_language ? `&lang=${common.current_language}` : '';
             sendBridgeEvent('trading:transfer', () => {
-                window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                window.location.href = `${brandUrl}/transfer?from=dtrader&source=options&acc=options&curr=${currency}${lang_param}`;
             });
         }
     };

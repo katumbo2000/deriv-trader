@@ -29,7 +29,7 @@ const InsufficientBalanceModal = observer(
                 const brandUrl = getBrandUrl();
                 const lang_param = current_language ? `&lang=${current_language}` : '';
                 sendBridgeEvent('trading:transfer', () => {
-                    window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                    window.location.href = `${brandUrl}/transfer?from=dtrader&source=options&acc=options&curr=${currency}${lang_param}`;
                 });
             } else {
                 toggleModal();

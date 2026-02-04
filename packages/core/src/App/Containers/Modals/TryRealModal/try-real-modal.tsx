@@ -15,7 +15,7 @@ const TryRealModal = observer(() => {
         const brandUrl = getBrandUrl();
         const lang_param = common.current_language ? `&lang=${common.current_language}` : '';
         sendBridgeEvent('trading:account_creation', () => {
-            window.location.href = `${brandUrl}/onboarding/personal-details?from=home&source=options${lang_param}`;
+            window.location.href = `${brandUrl}/onboarding/personal-details?source=options${lang_param}`;
         });
     };
 

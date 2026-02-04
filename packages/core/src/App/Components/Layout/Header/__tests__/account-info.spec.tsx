@@ -3,7 +3,7 @@ import { formatMoney, getAccountType } from '@deriv/shared';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 
-import AccountInfo from '../account-info.jsx';
+import AccountInfo from '../account-info';
 
 // Mock the required functions from @deriv/shared
 jest.mock('@deriv/shared', () => ({
@@ -37,8 +37,24 @@ const mockGetAccountType = getAccountType as jest.MockedFunction<typeof getAccou
 const mockFormatMoney = formatMoney as jest.MockedFunction<typeof formatMoney>;
 
 const defaultAccounts = [
-    { account_id: 'CR123', account_type: 'real', balance: '10000.00', currency: 'USD' },
-    { account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' },
+    {
+        account_id: 'CR123',
+        account_type: 'real' as const,
+        balance: '10000.00',
+        currency: 'USD',
+        group: 'real',
+        status: 'active' as const,
+        timestamp: '2024-01-01',
+    },
+    {
+        account_id: 'VRTC456',
+        account_type: 'demo' as const,
+        balance: '5000.00',
+        currency: 'USD',
+        group: 'demo',
+        status: 'active' as const,
+        timestamp: '2024-01-01',
+    },
 ];
 
 const renderWithProviders = (client_config = {}, props_override = {}) => {

@@ -421,9 +421,7 @@ describe('<ToggleMenuDrawer />', () => {
             const homeItem = homeItems.find(item => item.textContent?.includes('Home'));
             await user.click(homeItem);
 
-            expect(mockLocation.href).toBe(
-                'https://deriv.com/home?acc=options&curr=EUR&from=home&source=options&lang=ES'
-            );
+            expect(mockLocation.href).toBe('https://deriv.com/home?source=options&acc=options&curr=EUR&lang=ES');
         });
 
         it('should encode URL parameters correctly', async () => {
@@ -455,9 +453,7 @@ describe('<ToggleMenuDrawer />', () => {
             await user.click(homeItem);
 
             // Verify that the language parameter is properly encoded
-            expect(mockLocation.href).toBe(
-                'https://deriv.com/home?acc=options&curr=USD&from=home&source=options&lang=zh-CN'
-            );
+            expect(mockLocation.href).toBe('https://deriv.com/home?source=options&acc=options&curr=USD&lang=zh-CN');
         });
 
         it('should handle empty currency gracefully', async () => {

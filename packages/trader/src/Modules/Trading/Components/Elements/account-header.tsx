@@ -113,7 +113,7 @@ const AccountHeader = observer(
                 const brandUrl = getBrandUrl();
                 const lang_param = common.current_language ? `&lang=${common.current_language}` : '';
                 sendBridgeEvent('trading:transfer', () => {
-                    window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                    window.location.href = `${brandUrl}/transfer?from=dtrader&source=options&acc=options&curr=${currency}${lang_param}`;
                 });
             }
         };

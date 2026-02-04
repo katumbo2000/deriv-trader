@@ -51,7 +51,7 @@ jest.mock('../login-button', () => ({
 }));
 
 // Mock the dynamic import of AccountInfo
-jest.mock('App/Components/Layout/Header/account-info.jsx', () => ({
+jest.mock('App/Components/Layout/Header/account-info', () => ({
     __esModule: true,
     default: () => <div data-testid='dt_account_info'>Account Info</div>,
 }));

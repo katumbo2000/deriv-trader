@@ -89,7 +89,7 @@ const ToggleMenuDrawer = observer(() => {
             const brandUrl = getBrandUrl();
             const lang_param = current_language ? `&lang=${encodeURIComponent(current_language)}` : '';
             const curr = encodeURIComponent(currency || '');
-            window.location.href = `${brandUrl}/home?acc=options&curr=${curr}&from=home&source=options${lang_param}`;
+            window.location.href = `${brandUrl}/home?source=options&acc=options&curr=${curr}${lang_param}`;
         });
     }, [toggleDrawer, sendBridgeEvent, current_language, currency]);
 
