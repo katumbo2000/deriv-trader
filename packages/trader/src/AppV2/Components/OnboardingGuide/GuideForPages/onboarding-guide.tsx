@@ -100,6 +100,8 @@ const OnboardingGuide = ({ type = 'trade_page', is_dark_mode_on, callback }: TOn
         // Only show onboarding for mobile users
         if (!isMobile) return;
 
+        clearTimeout(guide_timeout_ref.current);
+
         // For new users: show modal to start full onboarding
         if (!guide_dtrader_v2?.[type]) {
             guide_timeout_ref.current = setTimeout(() => setIsModalOpen(true), 800);

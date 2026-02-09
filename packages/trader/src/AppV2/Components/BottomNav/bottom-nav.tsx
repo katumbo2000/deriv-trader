@@ -1,6 +1,7 @@
 import React from 'react';
-import clsx from 'clsx';
 import { useHistory, useLocation } from 'react-router';
+import clsx from 'clsx';
+
 import { routes } from '@deriv/shared';
 import { Navigation } from '@deriv-com/quill-ui';
 
@@ -22,6 +23,13 @@ const BottomNav = ({ bottomNavItems }: BottomNavProps) => {
     const navIndex = bottomNavItems?.findIndex(item => item.path === location.pathname);
 
     const [selectedIndex, setSelectedIndex] = React.useState(navIndex !== undefined && navIndex > -1 ? navIndex : 0);
+
+    React.useEffect(() => {
+        const currentIndex = bottomNavItems?.findIndex(item => item.path === location.pathname);
+        if (currentIndex !== undefined && currentIndex > -1) {
+            setSelectedIndex(currentIndex);
+        }
+    }, [location.pathname, bottomNavItems]);
 
     const handleSelect = (index: number) => {
         setSelectedIndex(index);
