@@ -7,6 +7,7 @@ import LanguageSelector from '../language-selector';
 
 const mockSwitchLanguage = jest.fn();
 const mockChangeSelectedLanguage = jest.fn();
+const mockOnLanguageChange = jest.fn();
 
 jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
@@ -37,10 +38,10 @@ describe('<LanguageSelector />', () => {
         },
     });
 
-    const renderLanguageSelector = (store = defaultStore) => {
+    const renderLanguageSelector = (store = defaultStore, onLanguageChange = mockOnLanguageChange) => {
         return render(
             <StoreProvider store={store}>
-                <LanguageSelector />
+                <LanguageSelector onLanguageChange={onLanguageChange} />
             </StoreProvider>
         );
     };
@@ -169,5 +170,28 @@ describe('<LanguageSelector />', () => {
         const buttonTexts = buttons.map(button => button.textContent);
 
         expect(buttonTexts).toEqual(['English', 'Español', 'Français', 'Português']);
+    });
+
+    it('should call onLanguageChange callback after language change', async () => {
+        renderLanguageSelector();
+        const spanishButton = screen.getByRole('button', { name: 'Español' });
+
+        fireEvent.click(spanishButton);
+
+        await waitFor(() => {
+            expect(mockOnLanguageChange).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('should not call onLanguageChange when callback is not provided', async () => {
+        renderLanguageSelector(defaultStore, undefined);
+        const spanishButton = screen.getByRole('button', { name: 'Español' });
+
+        fireEvent.click(spanishButton);
+
+        await waitFor(() => {
+            expect(mockChangeSelectedLanguage).toHaveBeenCalledWith('ES');
+        });
+        // Should not throw error when callback is undefined
     });
 });

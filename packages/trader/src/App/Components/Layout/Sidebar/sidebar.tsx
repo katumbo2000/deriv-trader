@@ -2,9 +2,11 @@ import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
+import { useMobileBridge } from '@deriv/api';
 import { Button, Flyout, Text } from '@deriv/components';
 import {
     DerivProductBrandLightDerivTraderLogoIcon,
+    LabelPairedLifeRingSmRegularIcon,
     LegacyHomeNewIcon,
     StandaloneCircleUserFillIcon,
     StandaloneCircleUserRegularIcon,
@@ -16,11 +18,9 @@ import {
     StandaloneMoonRegularIcon,
     StandaloneSunBrightRegularIcon,
 } from '@deriv/quill-icons';
-import { getBrandUrl, routes } from '@deriv/shared';
+import { getBrandUrl, getHelpCentreUrl, routes } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { Localize, localize, useTranslations } from '@deriv-com/translations';
-
-import { useMobileBridge } from '@deriv/api';
 
 import { PositionsDrawerContent, PositionsDrawerFooter } from '../../Elements/PositionsDrawer';
 
@@ -46,7 +46,6 @@ const Sidebar = observer(() => {
     const { active_positions_count, onMount, onUnmount } = portfolio;
     const location = useLocation();
     const history = useHistory();
-    const [is_sidebar_highlighted, setIsSidebarHighlighted] = React.useState(false);
     const sidebar_ref = React.useRef<HTMLElement>(null);
     const { sendBridgeEvent } = useMobileBridge();
 
@@ -83,23 +82,24 @@ const Sidebar = observer(() => {
         history.push(routes.reports);
     };
 
+    const handleHelpCentreClick = () => {
+        closeSidebarFlyout();
+        window.open(getHelpCentreUrl(), '_blank', 'noopener,noreferrer');
+    };
+
     const handleHomeClick = () => {
         closeSidebarFlyout();
         sendBridgeEvent('trading:home', () => {
             const brandUrl = getBrandUrl();
             const lang_param = current_language ? `&lang=${current_language}` : '';
             const currency = client.currency || '';
-            window.location.href = `${brandUrl}/home?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+            window.location.href = `${brandUrl}/home?source=options&acc=options&curr=${currency}${lang_param}`;
         });
     };
 
     const closeFlyout = () => {
         closeSidebarFlyout();
     };
-
-    const handleSidebarHighlight = React.useCallback((is_highlighted: boolean) => {
-        setIsSidebarHighlighted(is_highlighted);
-    }, []);
 
     // Main navigation items
     const isPositionsActive = active_sidebar_flyout === 'positions';
@@ -143,6 +143,14 @@ const Sidebar = observer(() => {
 
     const utilityItems = [
         {
+            id: 'help',
+            icon: <LabelPairedLifeRingSmRegularIcon fill='var(--color-text-primary)' />,
+            label: localize('Help'),
+            onClick: handleHelpCentreClick,
+            isActive: false,
+            dataTestId: 'dt_sidebar_help',
+        },
+        {
             id: 'language',
             icon: isLanguageActive ? (
                 <StandaloneGlobeFillIcon fill='var(--color-nav-item-active)' iconSize='sm' />
@@ -185,7 +193,7 @@ const Sidebar = observer(() => {
             case 'language':
                 return {
                     title: <Localize i18n_default_text='Language' />,
-                    content: <LanguageSelector />,
+                    content: <LanguageSelector onLanguageChange={closeFlyout} />,
                     footer: null,
                 };
             case 'account':
@@ -213,7 +221,6 @@ const Sidebar = observer(() => {
                 ref={sidebar_ref}
                 className={classNames('sidebar', {
                     sidebar__hidden: !isActiveRoute(routes.index),
-                    'sidebar--highlighted': is_sidebar_highlighted,
                 })}
                 data-testid='dt_sidebar'
             >

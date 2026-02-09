@@ -16,8 +16,10 @@ import {
 } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { useDevice } from '@deriv-com/ui';
+
 import { PositionsCardLoader } from 'App/Components/Elements/ContentLoader';
 import ContractAudit from 'App/Components/Elements/ContractAudit';
+
 import ContractDrawerCard from './contract-drawer-card';
 import { SwipeableContractAudit } from './swipeable-components';
 
@@ -68,6 +70,7 @@ const ContractDrawer = observer(
         const contract_drawer_card_ref = React.useRef<HTMLDivElement>(null);
         const [should_show_contract_audit, setShouldShowContractAudit] = React.useState(false);
         const { isMobile } = useDevice();
+        const nodeRef = React.useRef(null);
 
         const contract_audit = (
             <ContractAudit
@@ -125,8 +128,17 @@ const ContractDrawer = observer(
         );
 
         const contract_drawer = (
-            <CSSTransition in={should_show_contract_audit} timeout={250} classNames='contract-drawer__transition'>
+            <CSSTransition
+                in={should_show_contract_audit}
+                timeout={250}
+                classNames='contract-drawer__transition'
+                nodeRef={nodeRef}
+            >
                 <div
+                    ref={node => {
+                        (nodeRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+                        (contract_drawer_ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+                    }}
                     id='dt_contract_drawer'
                     className={classNames('contract-drawer', {
                         'contract-drawer--with-collapsible-btn': !!getEndTime(contract_info) || isMobile,
@@ -139,7 +151,6 @@ const ContractDrawer = observer(
                             contract_drawer_card_ref.current &&
                             `translateY(calc(${contract_drawer_card_ref.current.clientHeight}px - ${contract_drawer_ref.current.clientHeight}px + ${PAGE_BOTTOM_MARGIN}px))`) as React.CSSProperties['transform'],
                     }}
-                    ref={contract_drawer_ref}
                 >
                     <div className='contract-drawer__body' ref={contract_drawer_card_ref}>
                         {body_content}

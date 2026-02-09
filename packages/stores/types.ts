@@ -377,6 +377,8 @@ type TUiStore = {
     toggleUrlUnavailableModal: (value: boolean) => void;
     toggleLogoutSuccessModal: (value: boolean) => void;
     is_try_real_modal_visible: boolean;
+    is_switching_account: boolean;
+    setIsSwitchingAccount: (value: boolean) => void;
     toggleTryRealModal: (value: boolean) => void;
     setSidebarFlyout: (flyout_type: 'theme' | 'language' | 'positions' | 'account' | null) => void;
     closeSidebarFlyout: () => void;

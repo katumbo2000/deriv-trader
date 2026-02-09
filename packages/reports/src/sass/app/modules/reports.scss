@@ -74,6 +74,9 @@ $side-padding: 1.2em;
         flex: 1;
         flex-direction: column;
         overflow: auto;
+        @include mobile-screen {
+            padding-bottom: 1.6rem;
+        }
     }
     .unknown-icon {
         margin-left: 8px;
@@ -541,17 +544,17 @@ $side-padding: 1.2em;
             }
         }
         &__seconds {
-            color: var(--brand-secondary)-1;
+            color: var(--brand-secondary);
 
             &__background {
-                background: var(--brand-secondary)-1;
+                background: var(--brand-secondary);
             }
         }
         &__minutes {
-            color: var(--brand-info)-1;
+            color: var(--brand-info);
 
             &__background {
-                background: var(--brand-info)-1;
+                background: var(--brand-info);
             }
         }
         &__hours {

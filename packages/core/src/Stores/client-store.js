@@ -451,13 +451,13 @@ export default class ClientStore extends BaseStore {
     }
 
     /**
-     * Sets up visibility change listener to check whoami when tab becomes visible
+     * Sets up visibility change and focus listeners to check whoami when tab becomes visible or gains focus
      */
     setupVisibilityListener() {
-        // Remove existing listener if any
+        // Remove existing listeners if any
         this.removeVisibilityListener();
 
-        // Create handler function
+        // Create visibility change handler
         this.tab_visibility_handler = () => {
             if (document.visibilityState === 'visible') {
                 // Tab became visible - check whoami
@@ -465,17 +465,28 @@ export default class ClientStore extends BaseStore {
             }
         };
 
-        // Add listener
+        // Create focus handler
+        this.window_focus_handler = () => {
+            // Window gained focus - check whoami
+            this.handleWhoAmI();
+        };
+
+        // Add listeners
         document.addEventListener('visibilitychange', this.tab_visibility_handler);
+        window.addEventListener('focus', this.window_focus_handler);
     }
 
     /**
-     * Removes the visibility change listener
+     * Removes the visibility change and focus listeners
      */
     removeVisibilityListener() {
         if (this.tab_visibility_handler) {
             document.removeEventListener('visibilitychange', this.tab_visibility_handler);
             this.tab_visibility_handler = null;
+        }
+        if (this.window_focus_handler) {
+            window.removeEventListener('focus', this.window_focus_handler);
+            this.window_focus_handler = null;
         }
     }
 

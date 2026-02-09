@@ -5,7 +5,6 @@ import { observer } from 'mobx-react-lite';
 import { useDerivativesAccount, useMobileBridge } from '@deriv/api';
 import { Button, Skeleton, Text } from '@deriv/components';
 import AccountSwitcher from '@deriv/core/src/App/Components/Layout/Header/account-switcher';
-import AccountSwitcherIntroTooltip from '@deriv/core/src/App/Components/Layout/Header/AccountSwitcherIntroTooltip';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
 import { addComma, getBrandUrl, getCurrencyDisplayCode, redirectToLogin, trackAnalyticsEvent } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
@@ -30,6 +29,8 @@ const AccountHeader = observer(
     }: AccountHeaderProps = {}) => {
         const { localize } = useTranslations();
         const { client, common, ui } = useStore();
+        const { is_switching_account, setIsSwitchingAccount } = ui;
+
         const { isMobile } = useDevice();
         const { sendBridgeEvent } = useMobileBridge();
 
@@ -44,27 +45,19 @@ const AccountHeader = observer(
 
         // Dropdown state
         const [is_dropdown_open, setIsDropdownOpen] = React.useState(false);
-        const [is_account_switcher_highlighted, setIsAccountSwitcherHighlighted] = React.useState(false);
-        const [is_switching_account, setIsSwitchingAccount] = React.useState(false);
         const dropdown_ref = React.useRef<HTMLDivElement>(null);
-        const account_switcher_container_ref = React.useRef<HTMLDivElement>(null);
-
-        // Handle account switcher highlight
-        const handleAccountSwitcherHighlight = React.useCallback((is_highlighted: boolean) => {
-            setIsAccountSwitcherHighlighted(is_highlighted);
-        }, []);
 
         // Handle account switch start
         const handleAccountSwitchStart = React.useCallback(() => {
             setIsSwitchingAccount(true);
-        }, []);
+        }, [setIsSwitchingAccount]);
 
-        // Reset switching state when data is available
+        // Reset switching state when loading completes (success or error)
         React.useEffect(() => {
-            if (!isLoading && data) {
+            if (!isLoading && (data || error)) {
                 setIsSwitchingAccount(false);
             }
-        }, [isLoading, data]);
+        }, [isLoading, data, error, setIsSwitchingAccount]);
 
         // Close dropdown when clicking outside
         React.useEffect(() => {
@@ -96,7 +89,6 @@ const AccountHeader = observer(
 
         // Determine account types available
         const hasOnlyDemoAccounts = accounts.length > 0 && accounts.every(acc => acc.account_type === 'demo');
-        const hasMultipleAccounts = accounts.length > 1;
 
         // Button logic:
         // - If only demo accounts exist -> show "Try real"
@@ -121,20 +113,15 @@ const AccountHeader = observer(
                 const brandUrl = getBrandUrl();
                 const lang_param = common.current_language ? `&lang=${common.current_language}` : '';
                 sendBridgeEvent('trading:transfer', () => {
-                    window.location.href = `${brandUrl}/transfer?acc=options&curr=${currency}&from=home&source=options${lang_param}`;
+                    window.location.href = `${brandUrl}/transfer?from=dtrader&source=options&acc=options&curr=${currency}${lang_param}`;
                 });
             }
         };
 
         const renderAccountInfo = () => (
             <React.Fragment>
-                <div
-                    className={classNames('account-header__container', {
-                        'account-header__container--highlighted': is_account_switcher_highlighted,
-                    })}
-                >
+                <div className='account-header__container'>
                     <div
-                        ref={account_switcher_container_ref}
                         className={classNames('account-header__info', {
                             'account-header__info--no-switcher': hasOnlyDemoAccounts,
                         })}
@@ -227,16 +214,7 @@ const AccountHeader = observer(
                             <Skeleton height={44} width={240} borderRadius={22} />
                         </div>
                     ) : (
-                        <React.Fragment>
-                            {renderAccountInfo()}
-                            <AccountSwitcherIntroTooltip
-                                is_logged_in={is_logged_in}
-                                is_dark_mode={ui.is_dark_mode_on}
-                                has_multiple_accounts={hasMultipleAccounts}
-                                account_switcher_ref={account_switcher_container_ref}
-                                onAccountSwitcherHighlight={handleAccountSwitcherHighlight}
-                            />
-                        </React.Fragment>
+                        renderAccountInfo()
                     )}
                 </div>
             </React.Fragment>

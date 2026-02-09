@@ -126,7 +126,7 @@ describe('TryRealModal', () => {
             await userEvent.click(completeSetupButton);
 
             expect(window.location.href).toBe(
-                'https://home.deriv.com/dashboard/onboarding/personal-details?from=home&source=options&lang=EN'
+                'https://home.deriv.com/dashboard/onboarding/personal-details?source=options&lang=EN'
             );
         });
 
@@ -148,7 +148,6 @@ describe('TryRealModal', () => {
 
             // Since mockSendBridgeEvent executes the fallback, window.location should be set
             expect(window.location.href).toContain('home.deriv.com/dashboard/onboarding/personal-details');
-            expect(window.location.href).toContain('from=home');
             expect(window.location.href).toContain('source=options');
             expect(window.location.href).toContain('lang=EN');
         });
@@ -218,7 +217,7 @@ describe('TryRealModal', () => {
             await userEvent.click(completeSetupButton);
 
             expect(window.location.href).toBe(
-                'https://home.deriv.com/dashboard/onboarding/personal-details?from=home&source=options&lang=EN'
+                'https://home.deriv.com/dashboard/onboarding/personal-details?source=options&lang=EN'
             );
         });
 

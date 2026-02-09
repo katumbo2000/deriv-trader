@@ -11,9 +11,6 @@ import registerServiceWorker from 'Utils/PWA';
 
 import AppNotificationMessages from './App/Containers/app-notification-messages.jsx';
 
-import 'promise-polyfill';
-
-AnalyticsInitializer();
 if (
     !!window?.localStorage.getItem?.('debug_service_worker') || // To enable local service worker related development
     !window.location.hostname.startsWith('localhost')
@@ -31,6 +28,7 @@ const initApp = async () => {
     if (wrapper) {
         const root = createRoot(wrapper);
         root.render(<App root_store={root_store} />);
+        AnalyticsInitializer();
     }
 };
 

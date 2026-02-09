@@ -14,6 +14,7 @@ type TUiStore = Pick<
     | 'addToast'
     | 'current_focus'
     | 'is_mobile'
+    | 'is_switching_account'
     | 'removeToast'
     | 'setCurrentFocus'
     | 'should_show_cancellation_warning'
@@ -48,6 +49,8 @@ const PositionsDrawerCardItem = ({
 }: TPositionDrawerCardItem) => {
     const { in_prop } = useNewRowTransition(is_new_row ?? false);
     const onClickRemoveRef = React.useRef(onClickRemove);
+    const nodeRef = React.useRef(null);
+
     React.useEffect(() => {
         onClickRemoveRef.current = onClickRemove;
     }, [onClickRemove]);
@@ -95,8 +98,9 @@ const PositionsDrawerCardItem = ({
             }}
             onEntered={measure}
             unmountOnExit
+            nodeRef={nodeRef}
         >
-            <div className='dc-contract-card__wrapper'>
+            <div ref={nodeRef} className='dc-contract-card__wrapper'>
                 <PositionsDrawerCard
                     {...portfolio_position}
                     {...props}
@@ -135,6 +139,7 @@ export const PositionsDrawerContent = observer(({ ...props }) => {
     } = portfolio;
     const {
         is_mobile,
+        is_switching_account,
         addToast,
         current_focus,
         removeToast,
@@ -147,6 +152,10 @@ export const PositionsDrawerContent = observer(({ ...props }) => {
     // Watch for actual translation changes to trigger DataList remount
     // This ensures heights are recalculated only after translations have loaded
     const translated_stake_label = localize('Stake:');
+
+    // Memoize keyMapper to prevent unnecessary DataList recalculations
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const keyMapper = React.useCallback((row: any) => row.id, []);
 
     // Removed onMount() call - now handled at sidebar level to ensure subscription is always active
 
@@ -173,6 +182,7 @@ export const PositionsDrawerContent = observer(({ ...props }) => {
                     server_time={server_time}
                     getContractById={getContractById}
                     is_mobile={is_mobile}
+                    is_switching_account={is_switching_account}
                     current_focus={current_focus}
                     removeToast={removeToast}
                     setCurrentFocus={setCurrentFocus}
@@ -182,21 +192,26 @@ export const PositionsDrawerContent = observer(({ ...props }) => {
                     {...props}
                 />
             )}
-            keyMapper={row => row.id}
+            keyMapper={keyMapper}
             row_gap={8}
         />
     );
 
-    return all_positions.length === 0 || error ? <EmptyPortfolioMessage error={error} /> : body_content;
+    return all_positions.length === 0 || error || is_switching_account ? (
+        <EmptyPortfolioMessage error={error} />
+    ) : (
+        body_content
+    );
 });
 
 /**
  * PositionsDrawerFooter - Footer component showing positions summary
  */
 export const PositionsDrawerFooter = observer(() => {
-    const { client, portfolio } = useStore();
+    const { client, portfolio, ui } = useStore();
     const { currency } = client;
     const { all_positions } = portfolio;
+    const { is_switching_account } = ui;
 
     const getTotalProfit = (active_positions: TPortfolioPosition[]) => {
         return active_positions.reduce((total: number, position: TPortfolioPosition) => {
@@ -205,7 +220,7 @@ export const PositionsDrawerFooter = observer(() => {
         }, 0);
     };
 
-    if (all_positions.length === 0) return null;
+    if (all_positions.length === 0 || is_switching_account) return null;
 
     return (
         <div className='positions-drawer-footer--summary'>

@@ -27,9 +27,10 @@ const PositionsContent = observer(({ hasButtonsDemo, isClosedTab, setHasButtonsD
     const [filteredPositions, setFilteredPositions] = React.useState<(TPortfolioPosition | TClosedPosition)[]>([]);
     const [noMatchesFound, setNoMatchesFound] = React.useState(false);
 
-    const { common, client, portfolio } = useStore();
+    const { common, client, portfolio, ui } = useStore();
     const { server_time = undefined } = isClosedTab ? {} : common; // Server time is required only to update cards timers in Open positions
     const { currency } = client;
+    const { is_switching_account } = ui;
     const {
         active_positions,
         is_active_empty,
@@ -61,7 +62,9 @@ const PositionsContent = observer(({ hasButtonsDemo, isClosedTab, setHasButtonsD
     const shouldShowEmptyMessage = hasNoPositions || noMatchesFound;
     const shouldShowContractCards =
         !!filteredPositions.length && (isClosedTab || (filteredPositions[0]?.contract_info as TContractInfo)?.status);
-    const shouldShowLoading = isClosedTab ? isFetchingClosedPositions && !filteredPositions.length : is_loading;
+    const shouldShowLoading = isClosedTab
+        ? isFetchingClosedPositions && !filteredPositions.length
+        : is_loading || is_switching_account;
     const shouldShowTakeProfit = !isClosedTab || !!(timeFilter || customTimeRangeFilter);
 
     const onScroll = (e: React.UIEvent<HTMLDivElement>) => {

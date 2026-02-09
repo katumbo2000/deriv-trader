@@ -5,9 +5,9 @@ import classNames from 'classnames';
 import { useMobileBridge, useRemoteConfig } from '@deriv/api';
 import { Div100vhContainer, MobileDrawer, ToggleSwitch } from '@deriv/components';
 import {
+    LabelPairedLifeRingMdRegularIcon,
     LegacyChartsIcon,
     LegacyChevronRight1pxIcon,
-    LegacyHelpCentreIcon,
     LegacyHomeOldIcon,
     LegacyLogout1pxIcon,
     LegacyMenuHamburger1pxIcon,
@@ -15,7 +15,7 @@ import {
     LegacyResponsibleTradingIcon,
     LegacyTheme1pxIcon,
 } from '@deriv/quill-icons';
-import { getBrandUrl, routes } from '@deriv/shared';
+import { getBrandUrl, getHelpCentreUrl, routes } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { useTranslations } from '@deriv-com/translations';
 
@@ -89,7 +89,7 @@ const ToggleMenuDrawer = observer(() => {
             const brandUrl = getBrandUrl();
             const lang_param = current_language ? `&lang=${encodeURIComponent(current_language)}` : '';
             const curr = encodeURIComponent(currency || '');
-            window.location.href = `${brandUrl}/home?acc=options&curr=${curr}&from=home&source=options${lang_param}`;
+            window.location.href = `${brandUrl}/home?source=options&acc=options&curr=${curr}${lang_param}`;
         });
     }, [toggleDrawer, sendBridgeEvent, current_language, currency]);
 
@@ -100,6 +100,11 @@ const ToggleMenuDrawer = observer(() => {
             await logoutClient();
         });
     }, [logoutClient, toggleDrawer, sendBridgeEvent]);
+
+    const handleHelpCentreClick = React.useCallback(() => {
+        toggleDrawer();
+        window.open(getHelpCentreUrl(), '_blank', 'noopener,noreferrer');
+    }, [toggleDrawer]);
 
     const renderSubMenuFromConfig = routePath => {
         const routes_config = getRoutesConfig();
@@ -132,17 +137,17 @@ const ToggleMenuDrawer = observer(() => {
         );
     };
 
-    // eslint-disable-next-line no-unused-vars -- Kept for future restoration
     const showHelpCentre = () => {
         return (
-            <MobileDrawer.Item>
-                <MenuLink
-                    link_to={/* TODO: add redirect to Help centre */ ''}
-                    icon={<LegacyHelpCentreIcon />}
-                    text={localize('Help centre')}
-                    onClickLink={toggleDrawer}
-                />
-            </MobileDrawer.Item>
+            !isBridgeAvailable && (
+                <MobileDrawer.Item onClick={handleHelpCentreClick}>
+                    <MenuLink
+                        icon={<LabelPairedLifeRingMdRegularIcon />}
+                        text={localize('Help centre')}
+                        onClickLink={toggleDrawer}
+                    />
+                </MobileDrawer.Item>
+            )
         );
     };
 
@@ -226,7 +231,6 @@ const ToggleMenuDrawer = observer(() => {
                                 </MobileDrawer.Item>
                                 {renderSubMenuFromConfig(routes.reports)}
                                 <MobileDrawer.Item
-                                    className='header__menu-mobile-theme'
                                     onClick={e => {
                                         e.preventDefault();
                                         toggleTheme(!is_dark_mode);
@@ -246,7 +250,7 @@ const ToggleMenuDrawer = observer(() => {
                                         />
                                     </div>
                                 </MobileDrawer.Item>
-                                {/* {showHelpCentre()} */}
+                                {showHelpCentre()}
                                 {/* {showResponsibleTrading()} */}
                                 {/* {showRegulatoryInformation()} */}
                                 {cs_chat_whatsapp && (

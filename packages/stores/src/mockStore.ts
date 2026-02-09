@@ -220,6 +220,8 @@ const mock = (): TStores & { is_mock: boolean } => {
             url_hashed_values: '',
             is_tnc_update_modal_open: false,
             toggleTncUpdateModal: jest.fn(),
+            is_switching_account: false,
+            setIsSwitchingAccount: jest.fn(),
         },
         notifications: {
             addNotificationMessage: jest.fn(),

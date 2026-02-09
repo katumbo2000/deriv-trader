@@ -1,8 +1,10 @@
-import classNames from 'classnames';
 import React from 'react';
 import { CSSTransition } from 'react-transition-group';
-import Text from '../text/text';
+import classNames from 'classnames';
+
 import { LegacyChevronLeft1pxIcon } from '@deriv/quill-icons';
+
+import Text from '../text/text';
 
 type TMobileDrawerSubmenu = {
     has_subheader?: boolean;
@@ -87,39 +89,45 @@ const SubMenuList = ({
     has_subheader,
     is_expanded,
     submenu_title,
-}: React.PropsWithChildren<TSubmenuList>) => (
-    <CSSTransition
-        in={is_expanded}
-        classNames={{
-            enter: 'dc-mobile-drawer__submenu-list--enter',
-            enterDone: 'dc-mobile-drawer__submenu-list--enter-done',
-            exit: 'dc-mobile-drawer__submenu-list--exit',
-        }}
-        timeout={250}
-        unmountOnExit
-    >
-        <div
-            className={classNames('dc-mobile-drawer__submenu-list', {
-                'dc-mobile-drawer__submenu-list--has-subheader': has_subheader,
-            })}
+}: React.PropsWithChildren<TSubmenuList>) => {
+    const nodeRef = React.useRef(null);
+
+    return (
+        <CSSTransition
+            in={is_expanded}
+            classNames={{
+                enter: 'dc-mobile-drawer__submenu-list--enter',
+                enterDone: 'dc-mobile-drawer__submenu-list--enter-done',
+                exit: 'dc-mobile-drawer__submenu-list--exit',
+            }}
+            timeout={250}
+            unmountOnExit
+            nodeRef={nodeRef}
         >
-            <div className='dc-mobile-drawer__submenu-list-title' onClick={collapse}>
-                <div className='dc-mobile-drawer__submenu-back'>
-                    <LegacyChevronLeft1pxIcon
-                        className='dc-mobile-drawer__submenu-back-icon'
-                        iconSize='xs'
-                        fill='var(--color-text-primary)'
-                    />
+            <div
+                ref={nodeRef}
+                className={classNames('dc-mobile-drawer__submenu-list', {
+                    'dc-mobile-drawer__submenu-list--has-subheader': has_subheader,
+                })}
+            >
+                <div className='dc-mobile-drawer__submenu-list-title' onClick={collapse}>
+                    <div className='dc-mobile-drawer__submenu-back'>
+                        <LegacyChevronLeft1pxIcon
+                            className='dc-mobile-drawer__submenu-back-icon'
+                            iconSize='xs'
+                            fill='var(--color-text-primary)'
+                        />
+                    </div>
+                    {submenu_title && (
+                        <Text as='h3' weight='bold' color='primary'>
+                            {submenu_title}
+                        </Text>
+                    )}
                 </div>
-                {submenu_title && (
-                    <Text as='h3' weight='bold' color='primary'>
-                        {submenu_title}
-                    </Text>
-                )}
+                {children}
             </div>
-            {children}
-        </div>
-    </CSSTransition>
-);
+        </CSSTransition>
+    );
+};
 
 export default SubMenu;

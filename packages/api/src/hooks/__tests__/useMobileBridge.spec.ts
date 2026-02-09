@@ -1,16 +1,24 @@
 import React from 'react';
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useMobileBridge } from '../useMobileBridge';
 
-// Mock console.error to avoid noise in tests
+// Mock console.error and console.warn to avoid noise in tests
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
 interface TestResult {
     sendBridgeEvent?: (
-        event: 'trading:back' | 'trading:home' | 'trading:transfer' | 'trading:account_creation',
+        event:
+            | 'trading:config'
+            | 'trading:ready'
+            | 'trading:back'
+            | 'trading:home'
+            | 'trading:transfer'
+            | 'trading:account_creation',
+        data?: TradingConfigData,
         fallback?: () => void | Promise<void>
     ) => Promise<boolean>;
     isBridgeAvailable?: boolean;
@@ -62,6 +70,17 @@ const TestComponent = ({ onResult }: { onResult: (result: TestResult) => void })
         React.createElement(
             'button',
             {
+                'data-testid': 'test-send-ready',
+                onClick: async () => {
+                    const result = await hookResult.sendBridgeEvent('trading:ready');
+                    onResult({ sendResult: result });
+                },
+            },
+            'Test Send Ready'
+        ),
+        React.createElement(
+            'button',
+            {
                 'data-testid': 'test-send-with-fallback',
                 onClick: async () => {
                     const mockFallback = jest.fn();
@@ -104,6 +123,20 @@ const TestComponent = ({ onResult }: { onResult: (result: TestResult) => void })
                 },
             },
             'Test Send Transfer With Fallback'
+        ),
+        React.createElement(
+            'button',
+            {
+                'data-testid': 'test-send-config-with-data',
+                onClick: async () => {
+                    const result = await hookResult.sendBridgeEvent('trading:config', {
+                        lang: 'EN',
+                        theme: 'dark',
+                    });
+                    onResult({ sendResult: result });
+                },
+            },
+            'Test Send Config With Data'
         )
     );
 };
@@ -122,26 +155,91 @@ describe('useMobileBridge', () => {
         // Reset location to default (no query params)
         delete (window as any).location;
         (window as any).location = { search: '' };
+        // Clear DerivAppChannel
+        delete (window as any).DerivAppChannel;
         mockConsoleError.mockClear();
+        mockConsoleWarn.mockClear();
     });
 
     afterAll(() => {
         mockConsoleError.mockRestore();
+        mockConsoleWarn.mockRestore();
     });
 
     describe('isBridgeAvailable', () => {
-        it('should return true when is_mobile_app query param is present', async () => {
+        it('should return true when is_mobile_app query param is present and DerivAppChannel exists', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            // Mock DerivAppChannel
+            const mockPostMessage = jest.fn();
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            // Wait for hook to detect bridge
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+        });
+
+        it('should poll and set true when DerivAppChannel is injected after mount', async () => {
             // Mock query parameter
             delete (window as any).location;
             (window as any).location = { search: '?is_mobile_app=true' };
 
             render(React.createElement(TestComponent, { onResult }));
 
+            // Initially false (no bridge yet)
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(false);
+                },
+                { timeout: 200 }
+            );
+
+            // Inject bridge after delay (simulating native app delay)
+            const mockPostMessage = jest.fn();
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            // Wait for hook to detect bridge (polling interval is 100ms)
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 500 }
+            );
+        });
+
+        it('should warn after 5 seconds if DerivAppChannel never appears', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            // Wait for warning after 5 seconds
+            await waitFor(
+                () => {
+                    expect(mockConsoleWarn).toHaveBeenCalledWith(
+                        '[useMobileBridge] DerivAppChannel not found after 5 seconds'
+                    );
+                },
+                { timeout: 6000 }
+            );
+
             const button = screen.getByTestId('test-bridge-available');
             await userEvent.click(button);
-
-            expect(testResult.isBridgeAvailable).toBe(true);
-        });
+            expect(testResult.isBridgeAvailable).toBe(false);
+        }, 7000); // Increase test timeout to 7 seconds
 
         it('should return false when query param is not present', async () => {
             // No query param
@@ -161,12 +259,21 @@ describe('useMobileBridge', () => {
             delete (window as any).location;
             (window as any).location = { search: '?is_mobile_app=true' };
 
+            // Mock DerivAppChannel
+            const mockPostMessage = jest.fn();
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
             render(React.createElement(TestComponent, { onResult }));
 
-            const button = screen.getByTestId('test-bridge-available');
-            await userEvent.click(button);
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
 
-            expect(testResult.isBridgeAvailable).toBe(true);
             // Verify it was stored in sessionStorage
             expect(sessionStorage.getItem('is_mobile_app')).toBe('true');
         });
@@ -179,13 +286,20 @@ describe('useMobileBridge', () => {
             delete (window as any).location;
             (window as any).location = { search: '' };
 
+            // Mock DerivAppChannel
+            const mockPostMessage = jest.fn();
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
             render(React.createElement(TestComponent, { onResult }));
 
-            const button = screen.getByTestId('test-bridge-available');
-            await userEvent.click(button);
-
-            // Should still be true because it reads from sessionStorage
-            expect(testResult.isBridgeAvailable).toBe(true);
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
         });
     });
 
@@ -202,6 +316,14 @@ describe('useMobileBridge', () => {
             };
 
             render(React.createElement(TestComponent, { onResult }));
+
+            // Wait for bridge to be detected
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
 
             const button = screen.getByTestId('test-send-back');
             await userEvent.click(button);
@@ -223,6 +345,13 @@ describe('useMobileBridge', () => {
 
             render(React.createElement(TestComponent, { onResult }));
 
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+
             const button = screen.getByTestId('test-send-home');
             await userEvent.click(button);
 
@@ -230,27 +359,48 @@ describe('useMobileBridge', () => {
             expect(mockPostMessage).toHaveBeenCalledWith(JSON.stringify({ event: 'trading:home' }));
         });
 
-        it('should execute fallback when bridge is not available', async () => {
-            // No DerivAppChannel
+        it('should send trading:ready event when bridge is available', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            const mockPostMessage = jest.fn();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
 
             render(React.createElement(TestComponent, { onResult }));
 
-            // Wait for initial render
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+
+            const button = screen.getByTestId('test-send-ready');
+            await userEvent.click(button);
+
+            expect(testResult.sendResult).toBe(true);
+            expect(mockPostMessage).toHaveBeenCalledWith(JSON.stringify({ event: 'trading:ready' }));
+        });
+
+        it('should execute fallback when bridge is not available', async () => {
+            // No DerivAppChannel
+            render(React.createElement(TestComponent, { onResult }));
 
             const button = screen.getByTestId('test-send-with-fallback');
             await userEvent.click(button);
 
-            // Wait for async operation to complete
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
-
-            expect(testResult.sendResult).toBe(true);
-            expect(testResult.fallbackCalled).toBe(1);
+            await waitFor(() => {
+                expect(testResult.sendResult).toBe(true);
+                expect(testResult.fallbackCalled).toBe(1);
+            });
         });
 
         it('should return false when no bridge and no fallback', async () => {
             // No DerivAppChannel
-
             render(React.createElement(TestComponent, { onResult }));
 
             const button = screen.getByTestId('test-send-back');
@@ -274,19 +424,26 @@ describe('useMobileBridge', () => {
 
             render(React.createElement(TestComponent, { onResult }));
 
-            // Wait for initial render
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
 
             const button = screen.getByTestId('test-send-with-fallback');
             await userEvent.click(button);
 
-            // Wait for async operation to complete
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
+            await waitFor(() => {
+                expect(testResult.sendResult).toBe(true);
+                expect(testResult.fallbackCalled).toBe(1);
+            });
 
-            expect(testResult.sendResult).toBe(true);
-            expect(testResult.fallbackCalled).toBe(1);
             expect(mockPostMessage).toHaveBeenCalled();
-            expect(mockConsoleError).toHaveBeenCalledWith('Failed to send bridge message:', expect.any(Error));
+            expect(mockConsoleError).toHaveBeenCalledWith(
+                '[useMobileBridge] Failed to send trading:back:',
+                expect.any(Error)
+            );
         });
 
         it('should handle bridge errors without fallback', async () => {
@@ -303,12 +460,22 @@ describe('useMobileBridge', () => {
 
             render(React.createElement(TestComponent, { onResult }));
 
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+
             const button = screen.getByTestId('test-send-back');
             await userEvent.click(button);
 
             expect(testResult.sendResult).toBe(false);
             expect(mockPostMessage).toHaveBeenCalled();
-            expect(mockConsoleError).toHaveBeenCalledWith('Failed to send bridge message:', expect.any(Error));
+            expect(mockConsoleError).toHaveBeenCalledWith(
+                '[useMobileBridge] Failed to send trading:back:',
+                expect.any(Error)
+            );
         });
 
         it('should send trading:transfer event when bridge is available', async () => {
@@ -323,6 +490,13 @@ describe('useMobileBridge', () => {
             };
 
             render(React.createElement(TestComponent, { onResult }));
+
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
 
             const button = screen.getByTestId('test-send-transfer');
             await userEvent.click(button);
@@ -344,6 +518,13 @@ describe('useMobileBridge', () => {
 
             render(React.createElement(TestComponent, { onResult }));
 
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+
             const button = screen.getByTestId('test-send-account-creation');
             await userEvent.click(button);
 
@@ -353,20 +534,15 @@ describe('useMobileBridge', () => {
 
         it('should execute fallback for trading:transfer when bridge is not available', async () => {
             // No DerivAppChannel
-
             render(React.createElement(TestComponent, { onResult }));
-
-            // Wait for initial render
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
 
             const button = screen.getByTestId('test-send-transfer-with-fallback');
             await userEvent.click(button);
 
-            // Wait for async operation to complete
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
-
-            expect(testResult.sendResult).toBe(true);
-            expect(testResult.fallbackCalled).toBe(1);
+            await waitFor(() => {
+                expect(testResult.sendResult).toBe(true);
+                expect(testResult.fallbackCalled).toBe(1);
+            });
         });
 
         it('should handle trading:transfer with fallback on bridge error', async () => {
@@ -384,19 +560,58 @@ describe('useMobileBridge', () => {
 
             render(React.createElement(TestComponent, { onResult }));
 
-            // Wait for initial render
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
 
             const button = screen.getByTestId('test-send-transfer-with-fallback');
             await userEvent.click(button);
 
-            // Wait for async operation to complete
-            await new Promise<void>(resolve => setTimeout(resolve, 0));
+            await waitFor(() => {
+                expect(testResult.sendResult).toBe(true);
+                expect(testResult.fallbackCalled).toBe(1);
+            });
+
+            expect(mockPostMessage).toHaveBeenCalled();
+            expect(mockConsoleError).toHaveBeenCalledWith(
+                '[useMobileBridge] Failed to send trading:transfer:',
+                expect.any(Error)
+            );
+        });
+
+        it('should send trading:config event with data when bridge is available', async () => {
+            // Mock query parameter
+            delete (window as any).location;
+            (window as any).location = { search: '?is_mobile_app=true' };
+
+            const mockPostMessage = jest.fn();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).DerivAppChannel = {
+                postMessage: mockPostMessage,
+            };
+
+            render(React.createElement(TestComponent, { onResult }));
+
+            await waitFor(
+                () => {
+                    expect(testResult.isBridgeAvailable).toBe(true);
+                },
+                { timeout: 1000 }
+            );
+
+            const button = screen.getByTestId('test-send-config-with-data');
+            await userEvent.click(button);
 
             expect(testResult.sendResult).toBe(true);
-            expect(testResult.fallbackCalled).toBe(1);
-            expect(mockPostMessage).toHaveBeenCalled();
-            expect(mockConsoleError).toHaveBeenCalledWith('Failed to send bridge message:', expect.any(Error));
+            expect(mockPostMessage).toHaveBeenCalledWith(
+                JSON.stringify({
+                    event: 'trading:config',
+                    data: { lang: 'EN', theme: 'dark' },
+                })
+            );
         });
     });
 });

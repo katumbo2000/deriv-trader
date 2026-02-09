@@ -40,6 +40,7 @@ const CardFooter = ({
     should_show_transition,
 }: TCardFooterPropTypes) => {
     const { in_prop } = useNewRowTransition(!!should_show_transition);
+    const nodeRef = React.useRef(null);
 
     // Only run when should_show_transition changes to avoid unnecessary re-renders
     React.useEffect(() => {
@@ -120,9 +121,10 @@ const CardFooter = ({
                 exit: 'dc-contract-card__sell-button--exit',
             }}
             onEntered={onFooterEntered}
+            nodeRef={nodeRef}
             unmountOnExit
         >
-            {footer_content}
+            <div ref={nodeRef}>{footer_content}</div>
         </CSSTransition>
     );
 };

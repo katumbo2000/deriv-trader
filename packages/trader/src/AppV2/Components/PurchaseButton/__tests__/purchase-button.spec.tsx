@@ -222,6 +222,26 @@ describe('PositionsContent', () => {
         expect(default_mock_store.modules.trade.onPurchaseV2).toBeCalled();
     });
 
+    it('should disable the button when account is switching', async () => {
+        default_mock_store.ui.is_switching_account = true;
+        mockPurchaseButton();
+
+        const purchase_button = screen.getAllByRole('button')[0];
+        expect(purchase_button).toBeDisabled();
+
+        await userEvent.click(purchase_button);
+        expect(default_mock_store.modules.trade.onPurchaseV2).not.toBeCalled();
+    });
+
+    it('should enable the button when account is not switching and all conditions are met', () => {
+        default_mock_store.ui.is_switching_account = false;
+        default_mock_store.modules.trade.is_trade_enabled_v2 = true;
+        mockPurchaseButton();
+
+        const purchase_button = screen.getAllByRole('button')[0];
+        expect(purchase_button).toBeEnabled();
+    });
+
     it('should render only one button if trade_types have only one field and there are no trade type tabs', () => {
         default_mock_store.modules.trade.contract_type = TRADE_TYPES.ACCUMULATOR;
         default_mock_store.modules.trade.trade_types = {

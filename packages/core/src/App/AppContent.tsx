@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { useTrackJS } from '@deriv/api';
+import { useMobileBridge, useTrackJS } from '@deriv/api';
 import { observer, useStore } from '@deriv/stores';
 import { ThemeProvider } from '@deriv-com/quill-ui';
-import { useTranslations } from '@deriv-com/translations';
+import { getInitialLanguage, useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 
 import ErrorBoundary from './Components/Elements/Errors/error-boundary.jsx';
@@ -26,6 +26,7 @@ const AppContent: React.FC<{ passthrough: any }> = observer(({ passthrough }) =>
     const { isMobile } = useDevice();
 
     const { switchLanguage } = useTranslations();
+    const { isBridgeAvailable, sendBridgeEvent } = useMobileBridge();
 
     // NOTE: Disabled Intercom until further notice
     // const { data } = useRemoteConfig(true);
@@ -46,6 +47,17 @@ const AppContent: React.FC<{ passthrough: any }> = observer(({ passthrough }) =>
         html?.setAttribute('lang', current_language.toLowerCase());
         html?.setAttribute('dir', current_language.toLowerCase() === 'ar' ? 'rtl' : 'ltr');
     }, [current_language, switchLanguage, html]);
+
+    // Send trading:config event when language or theme changes
+    React.useEffect(() => {
+        if (isBridgeAvailable) {
+            const language = current_language || getInitialLanguage();
+            sendBridgeEvent('trading:config', {
+                lang: language,
+                theme: is_dark_mode_on ? 'dark' : 'light',
+            });
+        }
+    }, [isBridgeAvailable, sendBridgeEvent, current_language, is_dark_mode_on]);
 
     return (
         <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>

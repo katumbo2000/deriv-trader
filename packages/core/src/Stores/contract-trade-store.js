@@ -184,6 +184,13 @@ export default class ContractTradeStore extends BaseStore {
         should_update_contract_barriers,
         underlying,
     }) {
+        const { symbol } = JSON.parse(sessionStorage.getItem('trade_store')) || {};
+
+        // Reject updates from wrong market or missing underlying
+        if (underlying && symbol && underlying !== symbol) {
+            return;
+        }
+
         // If we have new barrier data, update and set loading to false
         if (accumulators_high_barrier || accumulators_low_barrier) {
             this.setBarriersLoadingState(false);

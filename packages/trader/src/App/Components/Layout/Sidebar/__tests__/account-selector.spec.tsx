@@ -1,20 +1,32 @@
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useMobileBridge } from '@deriv/api';
-
 import AccountSelector from '../account-selector';
 
 jest.mock('@deriv-com/translations', () => ({
     localize: (key: string) => key,
 }));
 
+// Mock useMobileBridge hook
+const mockSendBridgeEvent = jest.fn(async (_event, dataOrFallback, fallback) => {
+    // Handle overloaded signature - detect if second param is function or data
+    const actualFallback = typeof dataOrFallback === 'function' ? dataOrFallback : fallback;
+    // Execute fallback to simulate browser behavior
+    if (actualFallback) await actualFallback();
+    return true;
+});
+
+let mockIsBridgeAvailable = false;
+
 jest.mock('@deriv/api', () => ({
     ...jest.requireActual('@deriv/api'),
-    useMobileBridge: jest.fn(),
+    useMobileBridge: () => ({
+        sendBridgeEvent: mockSendBridgeEvent,
+        get isBridgeAvailable() {
+            return mockIsBridgeAvailable;
+        },
+    }),
 }));
-
-const mockUseMobileBridge = useMobileBridge as jest.MockedFunction<typeof useMobileBridge>;
 
 describe('AccountSelector', () => {
     const defaultStoreConfig = {
@@ -38,14 +50,8 @@ describe('AccountSelector', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        // Reset the mobile bridge mock to default values
-        mockUseMobileBridge.mockReturnValue({
-            sendBridgeEvent: jest.fn(async (_event_name, callback) => {
-                if (callback) await callback();
-                return Promise.resolve(true);
-            }),
-            isBridgeAvailable: false,
-        });
+        mockSendBridgeEvent.mockClear();
+        mockIsBridgeAvailable = false;
     });
 
     it('should render Log out button when user is logged in', () => {
@@ -54,13 +60,7 @@ describe('AccountSelector', () => {
     });
 
     it('should render "Back to app" button when bridge is available', () => {
-        mockUseMobileBridge.mockReturnValue({
-            sendBridgeEvent: jest.fn(async (_event_name, callback) => {
-                if (callback) await callback();
-                return Promise.resolve(true);
-            }),
-            isBridgeAvailable: true,
-        });
+        mockIsBridgeAvailable = true;
 
         renderComponent();
         expect(screen.getByText('Back to app')).toBeInTheDocument();

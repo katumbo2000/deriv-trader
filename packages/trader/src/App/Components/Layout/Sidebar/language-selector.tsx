@@ -6,7 +6,11 @@ import { UNSUPPORTED_LANGUAGES } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { getAllowedLanguages, useTranslations } from '@deriv-com/translations';
 
-const LanguageSelector = observer(() => {
+type TLanguageSelectorProps = {
+    onLanguageChange?: () => void;
+};
+
+const LanguageSelector = observer(({ onLanguageChange }: TLanguageSelectorProps) => {
     const { common } = useStore();
     const { currentLang, switchLanguage } = useTranslations();
     const { changeSelectedLanguage } = common;
@@ -15,6 +19,7 @@ const LanguageSelector = observer(() => {
     const handleLanguageChange = async (lang: string) => {
         await changeSelectedLanguage(lang);
         switchLanguage(lang);
+        onLanguageChange?.();
     };
 
     return (

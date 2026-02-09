@@ -154,6 +154,7 @@ export default class UIStore extends BaseStore {
     is_try_real_modal_visible = false;
     sub_section_index = 0;
     field_ref_to_focus = null;
+    is_switching_account = false;
 
     // tnc update
     is_tnc_update_modal_open = false;
@@ -248,6 +249,7 @@ export default class UIStore extends BaseStore {
             isUrlUnavailableModalVisible: observable,
             is_logout_success_modal_visible: observable,
             is_try_real_modal_visible: observable,
+            is_switching_account: observable,
             manage_real_account_tab_index: observable,
             modal_index: observable,
             notification_messages_ui: observable,
@@ -347,6 +349,7 @@ export default class UIStore extends BaseStore {
             toggleTryRealModal: action.bound,
             setSidebarFlyout: action.bound,
             closeSidebarFlyout: action.bound,
+            setIsSwitchingAccount: action.bound,
         });
 
         window.addEventListener('resize', this.handleResize);
@@ -786,6 +789,10 @@ export default class UIStore extends BaseStore {
 
     toggleTryRealModal(value) {
         this.is_try_real_modal_visible = value;
+    }
+
+    setIsSwitchingAccount(value) {
+        this.is_switching_account = value;
     }
 
     setSidebarFlyout(flyout_type) {

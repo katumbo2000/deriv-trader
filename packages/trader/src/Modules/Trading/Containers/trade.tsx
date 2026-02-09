@@ -133,6 +133,12 @@ const Trade = observer(() => {
 
     React.useEffect(() => {
         onMount();
+        return () => onUnmount();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Market selection logic - runs when synthetics availability changes
+    React.useEffect(() => {
         if (!is_synthetics_available) {
             const setMarket = async () => {
                 const markets_to_search = ['forex', 'indices', 'commodities']; // none-synthetic
@@ -146,8 +152,7 @@ const Trade = observer(() => {
 
             setMarket();
         }
-        return () => onUnmount();
-    }, [onMount, onUnmount, getFirstOpenMarket, is_synthetics_available]);
+    }, [is_synthetics_available, getFirstOpenMarket]);
 
     // Clear contract markers when navigating to trade page from reports
     React.useEffect(() => {

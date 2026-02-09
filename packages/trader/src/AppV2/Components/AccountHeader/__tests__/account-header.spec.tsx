@@ -36,9 +36,11 @@ const mockUseDerivativesAccount = jest.fn(() => ({
 }));
 
 // Mock useMobileBridge hook
-const mockSendBridgeEvent = jest.fn(async (_event, fallback) => {
+const mockSendBridgeEvent = jest.fn(async (_event, dataOrFallback, fallback) => {
+    // Handle overloaded signature - detect if second param is function or data
+    const actualFallback = typeof dataOrFallback === 'function' ? dataOrFallback : fallback;
     // Execute fallback to simulate browser behavior
-    if (fallback) await fallback();
+    if (actualFallback) await actualFallback();
     return true;
 });
 
@@ -87,12 +89,25 @@ describe('AccountHeader', () => {
             is_virtual: false,
             logout: jest.fn(),
         },
+        ui: {
+            is_switching_account: false,
+            setIsSwitchingAccount: jest.fn(),
+        },
     });
 
     const renderComponent = (store = default_mock_store, props = {}) => {
+        // Ensure all stores have ui mock with required methods
+        const store_with_ui = {
+            ...store,
+            ui: {
+                ...store.ui,
+                is_switching_account: false,
+                setIsSwitchingAccount: jest.fn(),
+            },
+        };
         return render(
             <APIProvider>
-                <StoreProvider store={store}>
+                <StoreProvider store={store_with_ui}>
                     <AccountHeader {...props} />
                 </StoreProvider>
             </APIProvider>

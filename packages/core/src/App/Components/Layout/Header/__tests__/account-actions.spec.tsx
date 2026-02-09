@@ -51,7 +51,7 @@ jest.mock('../login-button', () => ({
 }));
 
 // Mock the dynamic import of AccountInfo
-jest.mock('App/Components/Layout/Header/account-info.jsx', () => ({
+jest.mock('App/Components/Layout/Header/account-info', () => ({
     __esModule: true,
     default: () => <div data-testid='dt_account_info'>Account Info</div>,
 }));
@@ -67,10 +67,24 @@ describe('AccountActions component', () => {
         common: {
             current_language: 'en',
         },
+        ui: {
+            is_switching_account: false,
+            setIsSwitchingAccount: jest.fn(),
+        },
     };
 
     const renderWithStore = (store_override = {}) => {
-        const mock_store_instance = mockStore({ ...default_mock_store, ...store_override });
+        const merged_store = { ...default_mock_store, ...store_override };
+        // Ensure ui mock has required methods
+        const store_with_ui = {
+            ...merged_store,
+            ui: {
+                ...merged_store.ui,
+                is_switching_account: false,
+                setIsSwitchingAccount: jest.fn(),
+            },
+        };
+        const mock_store_instance = mockStore(store_with_ui);
         return render(
             <StoreProvider store={mock_store_instance}>
                 <AccountActions />

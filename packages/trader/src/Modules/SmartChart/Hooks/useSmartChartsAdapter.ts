@@ -18,6 +18,7 @@ interface AccumulatorBarriersData {
     accumulators_low_barrier?: string;
     barrier_spot_distance?: string;
     previous_spot_time?: number;
+    underlying?: string;
 }
 
 interface TickData {
@@ -189,7 +190,7 @@ export const useSmartChartsAdapter = (config: UseSmartChartsAdapterConfig = {}):
             });
 
             // Transform adapter result to SmartCharts Champion format
-            if (params.granularity === 0) {
+            if (validatedGranularity === 0) {
                 // For ticks, return history format
                 return {
                     history: {
@@ -247,17 +248,20 @@ export const useSmartChartsAdapter = (config: UseSmartChartsAdapterConfig = {}):
                     let current_spot_data: AccumulatorBarriersData = {};
 
                     if ('tick' in args[0]) {
-                        const { epoch, quote } = args[0].tick as any;
+                        const { epoch, quote, symbol } = args[0].tick as any;
                         current_spot_data = {
                             current_spot: quote,
                             current_spot_time: epoch,
+                            underlying: symbol,
                         };
                     } else if ('history' in args[0]) {
                         const { prices, times } = args[0].history as any;
+                        const symbol = args[0].echo_req?.ticks_history;
                         current_spot_data = {
                             current_spot: prices?.[prices?.length - 1],
                             current_spot_time: times?.[times?.length - 1],
                             previous_spot_time: times?.[times?.length - 2],
+                            underlying: symbol,
                         };
                     } else {
                         return;
