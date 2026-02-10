@@ -44,7 +44,7 @@ const validationReducer = (state: ValidationState, action: ValidationAction): Va
 
             // Immediate validation for hours
             let hoursError = '';
-            if (hoursValue !== '' && hours > MAX_HOURS) {
+            if (hoursValue !== '' && (hours < MIN_HOURS || hours > MAX_HOURS)) {
                 hoursError = getHoursRangeError();
             }
 
@@ -181,6 +181,10 @@ const DurationHoursInputDesktop: React.FC<DurationHoursInputDesktopProps> = obse
             if (!isSaveDisabled) {
                 handleSave();
             }
+            return;
+        }
+        if (e.key.length === 1 && !/\d/.test(e.key)) {
+            e.preventDefault();
         }
     };
 
@@ -204,7 +208,6 @@ const DurationHoursInputDesktop: React.FC<DurationHoursInputDesktopProps> = obse
                         value={state.hoursValue}
                         onChange={handleHoursChange}
                         onKeyDown={handleKeyDown}
-                        placeholder='0'
                         maxLength={2}
                         status={state.hoursError ? 'error' : 'neutral'}
                         message={state.hoursError}
@@ -217,7 +220,6 @@ const DurationHoursInputDesktop: React.FC<DurationHoursInputDesktopProps> = obse
                         value={state.minutesValue}
                         onChange={handleMinutesChange}
                         onKeyDown={handleKeyDown}
-                        placeholder='0'
                         maxLength={2}
                         status={state.minutesError ? 'error' : 'neutral'}
                         message={state.minutesError}

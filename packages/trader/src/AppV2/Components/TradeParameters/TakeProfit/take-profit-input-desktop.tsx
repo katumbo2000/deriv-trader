@@ -206,6 +206,10 @@ const TakeProfitInputDesktop = observer(({ onClose, is_open }: TTakeProfitInputD
             if (!isSaveDisabled) {
                 onSave();
             }
+            return;
+        }
+        if (e.key.length === 1 && !/[\d.,]/.test(e.key)) {
+            e.preventDefault();
         }
     };
 

@@ -232,6 +232,12 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
         }));
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key.length === 1 && !/[\d.,]/.test(e.key)) {
+            e.preventDefault();
+        }
+    };
+
     const onBeforeInputChange = (field: 'tp' | 'sl') => (e: React.FormEvent<HTMLInputElement>) => {
         if (
             ['.', ','].includes((e.nativeEvent as InputEvent)?.data ?? '') &&
@@ -342,6 +348,7 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
                         value={tp_state.input_value}
                         onChange={onTpInputChange}
                         onBeforeInput={onBeforeInputChange('tp')}
+                        onKeyDown={handleKeyDown}
                         placeholder={localize('Amount')}
                         variant='fill'
                         inputMode='decimal'
@@ -383,6 +390,7 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
                         value={sl_state.input_value}
                         onChange={onSlInputChange}
                         onBeforeInput={onBeforeInputChange('sl')}
+                        onKeyDown={handleKeyDown}
                         placeholder={localize('Amount')}
                         variant='fill'
                         inputMode='decimal'

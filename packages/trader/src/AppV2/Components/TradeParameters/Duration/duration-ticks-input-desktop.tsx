@@ -52,12 +52,9 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const value = e.target.value;
-            setInputValue(value);
+            if (value !== '' && !/^\d+$/.test(value)) return;
 
-            if (value.endsWith('.') || value.endsWith(',')) {
-                setError(localize('Should be a valid number.'));
-                return;
-            }
+            setInputValue(value);
 
             if (value) {
                 validateInput(value);
@@ -65,7 +62,7 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
                 setError('');
             }
         },
-        [localize, validateInput]
+        [validateInput]
     );
 
     const handleSave = useCallback(() => {
@@ -87,6 +84,10 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
             if (!isSaveDisabled) {
                 handleSave();
             }
+            return;
+        }
+        if (e.key.length === 1 && !/\d/.test(e.key)) {
+            e.preventDefault();
         }
     };
 
@@ -110,7 +111,6 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={localize('Ticks')}
                 variant='fill'
                 inputMode='numeric'
                 maxLength={2}

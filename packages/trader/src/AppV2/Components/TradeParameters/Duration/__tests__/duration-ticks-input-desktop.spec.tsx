@@ -138,14 +138,14 @@ describe('DurationTicksInputDesktop', () => {
             expect(screen.getByText('Please enter a duration between 1 to 10 ticks.')).toBeInTheDocument();
         });
 
-        it('shows error for negative value (-1)', async () => {
+        it('ignores non-digit characters like minus sign', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('textbox') as HTMLInputElement;
             await userEvent.clear(input);
             await userEvent.type(input, '-1');
 
-            expect(screen.getByText('Please enter a duration between 1 to 10 ticks.')).toBeInTheDocument();
+            expect(input).toHaveValue('1');
         });
 
         it('shows error for large value (99)', async () => {
@@ -160,44 +160,44 @@ describe('DurationTicksInputDesktop', () => {
     });
 
     describe('Input validation - Invalid input types', () => {
-        it('shows error for decimal/float value (5.5)', async () => {
+        it('ignores decimal/float characters (5.5 becomes 55)', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('textbox') as HTMLInputElement;
             await userEvent.clear(input);
             await userEvent.type(input, '5.5');
 
-            expect(screen.getByText('Should be a valid number.')).toBeInTheDocument();
+            expect(input).toHaveValue('55');
         });
 
-        it('shows error for value ending with decimal point (5.)', async () => {
+        it('ignores decimal point (5. becomes 5)', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('textbox') as HTMLInputElement;
             await userEvent.clear(input);
             await userEvent.type(input, '5.');
 
-            expect(screen.getByText('Should be a valid number.')).toBeInTheDocument();
+            expect(input).toHaveValue('5');
         });
 
-        it('shows error for value ending with comma (5,)', async () => {
+        it('ignores comma (5, becomes 5)', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('textbox') as HTMLInputElement;
             await userEvent.clear(input);
             await userEvent.type(input, '5,');
 
-            expect(screen.getByText('Should be a valid number.')).toBeInTheDocument();
+            expect(input).toHaveValue('5');
         });
 
-        it('shows error for non-numeric input (abc)', async () => {
+        it('ignores non-numeric input (abc)', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('textbox') as HTMLInputElement;
             await userEvent.clear(input);
             await userEvent.type(input, 'abc');
 
-            expect(screen.getByText('Should be a valid number.')).toBeInTheDocument();
+            expect(input).toHaveValue('');
         });
 
         it('shows error for empty input when trying to save', async () => {
@@ -302,13 +302,6 @@ describe('DurationTicksInputDesktop', () => {
 
             const input = screen.getByRole('textbox');
             expect(input).toHaveAttribute('maxLength', '2');
-        });
-
-        it('has placeholder text', () => {
-            render(<DurationTicksInputDesktop {...defaultProps} />);
-
-            const input = screen.getByPlaceholderText('Ticks');
-            expect(input).toBeInTheDocument();
         });
     });
 

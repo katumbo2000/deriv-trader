@@ -62,12 +62,9 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const value = e.target.value;
-            setInputValue(value);
+            if (value !== '' && !/^\d+$/.test(value)) return;
 
-            if (value.endsWith('.') || value.endsWith(',')) {
-                setError(localize('Should be a valid number.'));
-                return;
-            }
+            setInputValue(value);
 
             if (value) {
                 validateInput(value);
@@ -75,7 +72,7 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
                 setError('');
             }
         },
-        [localize, validateInput]
+        [validateInput]
     );
 
     const handleSave = useCallback(() => {
@@ -97,6 +94,10 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
             if (!isSaveDisabled) {
                 handleSave();
             }
+            return;
+        }
+        if (e.key.length === 1 && !/\d/.test(e.key)) {
+            e.preventDefault();
         }
     };
 
@@ -121,7 +122,6 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={localize(unit === 's' ? 'Seconds' : 'Minutes')}
                 variant='fill'
                 inputMode='numeric'
                 maxLength={unit === 's' ? 2 : 3}
