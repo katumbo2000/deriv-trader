@@ -37,10 +37,6 @@ type TPurchaseButtonProps = {
 
 const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {}) => {
     const [loading_button_index, setLoadingButtonIndex] = React.useState<number | null>(null);
-    const [error_info, setErrorInfo] = React.useState<{ has_error: boolean; message: string | null }>({
-        has_error: false,
-        message: null,
-    });
     const purchaseButtonRef = React.useRef(null);
     const sellButtonRef = React.useRef(null);
     const { isMobile } = useDevice();
@@ -98,10 +94,7 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
     };
     const has_no_button_content =
         is_vanilla || is_vanilla_fx || is_turbos || (is_accumulator && !has_open_accu_contract);
-    const contract_types = React.useMemo(
-        () => getDisplayedContractTypes(trade_types, contract_type, trade_type_tab),
-        [trade_types, contract_type, trade_type_tab]
-    );
+    const contract_types = getDisplayedContractTypes(trade_types, contract_type, trade_type_tab);
     const is_valid_to_sell = active_accu_contract?.contract_info
         ? hasContractEntered(active_accu_contract.contract_info) &&
           isOpen(active_accu_contract.contract_info) &&
@@ -164,19 +157,11 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [basis, basis_options, contract_type]);
 
-    const prev_trade_type_tab_ref = React.useRef(trade_type_tab);
+    const last_shown_error_ref = React.useRef<string | null>(null);
 
     React.useEffect(() => {
-        // When trade_type_tab changes, clear stale errors from the previous tab's proposals
-        // (e.g., switching Over→Under may leave a stale DIGITOVER error in proposal_info)
-        if (prev_trade_type_tab_ref.current !== trade_type_tab) {
-            prev_trade_type_tab_ref.current = trade_type_tab;
-            setErrorInfo({ has_error: false, message: null });
-            return;
-        }
-
         // Only check errors for the currently displayed contract types (filtered by trade_type_tab)
-        // to avoid showing errors from non-displayed contract types
+        // to avoid showing errors from non-displayed contract types (e.g., stale DIGITOVER error on Under tab)
         if (proposal_info && contract_types.length > 0) {
             let message = '';
             const has_error = contract_types.some(type => {
@@ -187,30 +172,25 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                 }
                 return false;
             });
-            setErrorInfo(prev => {
-                if (prev.has_error === has_error && prev.message === (message || '')) return prev;
-                return { has_error, message: message || '' };
-            });
-        }
-    }, [proposal_info, contract_types, trade_type_tab]);
 
-    React.useEffect(() => {
-        if (error_info.has_error && error_info.message) {
-            addSnackbar({
-                message: error_info.message,
-                status: 'fail',
-                hasCloseButton: true,
-                hasFixedHeight: false,
-                style: {
-                    marginBottom: is_logged_in ? '48px' : '-8px',
-                    width: 'calc(100% - var(--core-spacing-800))',
-                },
-            });
-
-            // Clear the error state after showing the snackbar
-            setErrorInfo({ has_error: false, message: null });
+            if (has_error && message && message !== last_shown_error_ref.current) {
+                last_shown_error_ref.current = message;
+                addSnackbar({
+                    message,
+                    status: 'fail',
+                    hasCloseButton: true,
+                    hasFixedHeight: false,
+                    style: {
+                        marginBottom: is_logged_in ? '48px' : '-8px',
+                        width: 'calc(100% - var(--core-spacing-800))',
+                    },
+                });
+            } else if (!has_error) {
+                last_shown_error_ref.current = null;
+            }
         }
-    }, [error_info.has_error]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [proposal_info]);
 
     return (
         <React.Fragment>
@@ -245,7 +225,7 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                         const is_loading = loading_button_index === index;
                         const is_disabled =
                             !is_trade_enabled_v2 ||
-                            (info.has_error && info.error_code !== 'InsufficientBalance') ||
+                            info.has_error ||
                             (!!purchase_info.error && !is_modal_error) ||
                             is_switching_account;
 

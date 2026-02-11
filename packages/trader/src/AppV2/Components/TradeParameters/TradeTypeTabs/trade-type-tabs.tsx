@@ -13,7 +13,7 @@ import { TTradeParametersProps } from '../trade-parameters';
 const TradeTypeTabs = observer(({ is_minimized }: TTradeParametersProps) => {
     const { contract_type, is_market_closed, onChange, trade_type_tab, setTradeTypeTab } = useTraderStore();
     const { isMobile } = useDevice();
-    const tab_list = React.useMemo(() => getTradeTypeTabsList(contract_type), [contract_type]);
+    const tab_list = getTradeTypeTabsList(contract_type);
     let initial_index = 0;
 
     // If the trade type tab is VANILLALONGPUT or TURBOSSHORT, keep the first tab
@@ -43,7 +43,8 @@ const TradeTypeTabs = observer(({ is_minimized }: TTradeParametersProps) => {
     React.useEffect(() => {
         setTabIndex(initial_tab_index);
         setTradeTypeTab(tab_list[initial_tab_index]?.contract_type);
-    }, [tab_list, initial_tab_index, setTradeTypeTab]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tab_list, initial_tab_index]);
 
     if (!tab_list.length) return null;
     return (
