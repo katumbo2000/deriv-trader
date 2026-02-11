@@ -23,6 +23,10 @@
 
     &__input {
         flex: 1;
+
+        .quill-input__wrapper__size--lg {
+            gap: var(--core-spacing-400);
+        }
     }
 
     &__prefix {
