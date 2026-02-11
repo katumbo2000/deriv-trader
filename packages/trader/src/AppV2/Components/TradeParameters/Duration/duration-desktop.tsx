@@ -556,11 +556,10 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
             return formatMinutesValue(duration);
         }
         if (duration_unit === 'd') {
-            // Calculate expiry date by adding duration days to current date
-            const expiryDate = moment().add(duration, 'days');
-            // Set time to 23:59 (end of day)
+            // Default display for daily duration: tomorrow at 23:59
+            // The 'd' unit always means at least 1 day, so tomorrow is the correct default
+            const expiryDate = moment().add(1, 'days');
             expiryDate.set({ hour: 23, minute: 59 });
-            // Format as "D MMM, HH:MM" (e.g., "6 Feb, 23:59")
             const formattedDate = expiryDate.format('D MMM');
             const formattedTime = expiryDate.format('HH:mm');
             return `${formattedDate}, ${formattedTime}`;

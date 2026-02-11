@@ -8,7 +8,7 @@ import { Button, DatePicker, TextField } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
 import { InputPopover } from 'AppV2/Components/InputPopover';
-import { getClosestTimeToCurrentGMT } from 'AppV2/Utils/trade-params-utils';
+import { getClosestTimeToCurrentGMT, getDatePickerStartDate } from 'AppV2/Utils/trade-params-utils';
 import { ContractType } from 'Stores/Modules/Trading/Helpers/contract-type';
 import { getBoundaries } from 'Stores/Modules/Trading/Helpers/end-time';
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -27,14 +27,17 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
     const { common } = useStore();
     const { server_time } = common;
     const {
+        expiry_type,
         expiry_time,
         expiry_date,
         duration_unit,
         duration,
         duration_units_list,
+        duration_min_max,
         market_open_times,
         market_close_times,
         start_date,
+        start_time,
         symbol,
         onChangeMultiple,
     } = useTraderStore();
@@ -65,20 +68,23 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
 
     // Helper to get initial date
     const getInitialDate = useCallback(() => {
-        // If duration_unit is 'd' (days) and duration exists, calculate from duration
-        if (duration_unit === 'd' && duration) {
-            return moment().add(duration, 'days').toDate();
+        // Priority 1: If user has explicitly saved an endtime, use the stored expiry_date
+        if (expiry_type === 'endtime' && expiry_date) {
+            const expiryMoment = moment(expiry_date);
+            if (expiryMoment.isSameOrAfter(moment(), 'day')) {
+                return expiryMoment.toDate();
+            }
         }
-        // If expiry_date exists and is today or a future date, use it
+        // Priority 2: If expiry_date exists and is today or a future date, use it
         if (expiry_date) {
             const expiryMoment = moment(expiry_date);
             if (expiryMoment.isSameOrAfter(moment(), 'day')) {
                 return expiryMoment.toDate();
             }
         }
-        // Default to today
-        return moment().toDate();
-    }, [expiry_date, duration_unit, duration]);
+        // Default to the minimum allowed date for this contract (matches mobile behavior)
+        return getDatePickerStartDate(duration_units_list, server_time, start_time, duration_min_max);
+    }, [expiry_date, expiry_type, duration_units_list, server_time, start_time, duration_min_max]);
 
     // Helper to get initial time based on date
     const getInitialTime = useCallback(
@@ -263,11 +269,10 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
         [disabled_days]
     );
 
-    // Min/max dates for calendar
+    // Min date for calendar - use same logic as mobile to respect contract-specific restrictions
     const getMinDate = useCallback(() => {
-        // Allow today as minimum date (like mobile)
-        return moment().toDate();
-    }, []);
+        return getDatePickerStartDate(duration_units_list, server_time, start_time, duration_min_max);
+    }, [duration_units_list, server_time, start_time, duration_min_max]);
 
     const getMaxDate = useCallback(() => {
         return moment().add(1, 'year').toDate();
