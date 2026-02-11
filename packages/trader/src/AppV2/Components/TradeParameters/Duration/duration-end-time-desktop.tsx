@@ -97,8 +97,8 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
                 }
                 return adjusted_start_time;
             }
-            // For future dates, always use 23:59
-            return '23:59';
+            // For future dates, use stored expiry_time if available (e.g. market close time)
+            return expiry_time ? expiry_time.substring(0, 5) : '23:59';
         },
         [expiry_time, adjusted_start_time, isToday]
     );
@@ -126,11 +126,8 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
 
     // Calculate the display time (what to show in the field)
     const displayTime = useMemo(() => {
-        if (is_24_hours_contract) {
-            return selectedTime;
-        }
-        return '23:59';
-    }, [is_24_hours_contract, selectedTime]);
+        return selectedTime;
+    }, [selectedTime]);
 
     // Update time when date changes
     useEffect(() => {
@@ -142,10 +139,11 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
                 setSelectedTime(adjusted_start_time);
             }
         } else {
-            // For future dates, always set to 23:59
-            setSelectedTime('23:59');
+            // For future dates, use stored expiry_time if available (e.g. market close time)
+            const storedTime = expiry_time ? expiry_time.substring(0, 5) : '23:59';
+            setSelectedTime(storedTime);
         }
-    }, [selectedDate, isToday, adjusted_start_time]);
+    }, [selectedDate, isToday, adjusted_start_time, expiry_time]);
 
     // Fetch trading days for calendar disabled days
     const onChangeCalendarMonth = useCallback(
@@ -211,13 +209,15 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
                 if (is_today) {
                     setSelectedTime(adjusted_start_time);
                 } else {
-                    setSelectedTime('23:59');
+                    // For future dates, use stored expiry_time if available (e.g. market close time)
+                    const storedTime = expiry_time ? expiry_time.substring(0, 5) : '23:59';
+                    setSelectedTime(storedTime);
                 }
 
                 setIsDatePickerOpen(false); // Auto-close on selection
             }
         },
-        [isToday, adjusted_start_time]
+        [isToday, adjusted_start_time, expiry_time]
     );
 
     const handleDatePickerClose = useCallback(() => {
@@ -247,8 +247,7 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
     // Save handler - saves both date AND time to store
     const handleSave = useCallback(() => {
         const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-        // Use displayTime (which accounts for is_24_hours_contract)
-        const timeToSave = is_24_hours_contract ? selectedTime : '23:59';
+        const timeToSave = selectedTime;
         const formattedTime =
             timeToSave.includes(':') && timeToSave.split(':').length === 2 ? `${timeToSave}:00` : timeToSave;
 
@@ -258,7 +257,7 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
             expiry_time: formattedTime,
         });
         onClose();
-    }, [selectedDate, selectedTime, is_24_hours_contract, onChangeMultiple, onClose]);
+    }, [selectedDate, selectedTime, onChangeMultiple, onClose]);
 
     // Disabled days for calendar
     const getDisabledDays = useCallback(
@@ -286,12 +285,11 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
     // Dynamic expiry message
     const getExpiryMessage = useCallback(() => {
         const formattedDate = moment(selectedDate).format('DD/MM/YYYY');
-        const timeToShow = is_24_hours_contract ? selectedTime : '23:59';
         return localize('Contract will expire on {{formatted_date}} at {{time}} GMT.', {
             formatted_date: formattedDate,
-            time: timeToShow,
+            time: selectedTime,
         });
-    }, [selectedDate, selectedTime, is_24_hours_contract, localize]);
+    }, [selectedDate, selectedTime, localize]);
 
     return (
         <div className='duration-end-time-desktop__wrapper'>

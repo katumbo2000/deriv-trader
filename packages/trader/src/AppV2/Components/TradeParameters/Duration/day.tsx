@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useInvalidateQuery } from '@deriv/api';
 import { LabelPairedCalendarSmRegularIcon, LabelPairedClockThreeSmRegularIcon } from '@deriv/quill-icons';
-import { hasIntradayDurationUnit, setTime, toMoment, mapErrorMessage } from '@deriv/shared';
+import { hasIntradayDurationUnit, mapErrorMessage, setTime, toMoment } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { ActionSheet, Text, TextField, useSnackbar } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
@@ -163,9 +163,10 @@ const DayInput = ({
     }, []);
 
     useEffect(() => {
-        // Simple logic: set time based on whether date is today or future
+        // Set time based on whether date is today or future
         const is_today = is_selected_date_today;
-        const time_to_set = is_today ? adjusted_start_time : '23:59:59';
+        // For future dates, use stored expiry_time if available (e.g. market close time)
+        const time_to_set = is_today ? adjusted_start_time : selected_expiry_time || '23:59:59';
 
         setBrowsingExpiryTime(time_to_set);
         setSelectedExpiryTime(time_to_set);
@@ -201,8 +202,10 @@ const DayInput = ({
             setBrowsingExpiryTime(adjusted_start_time);
             setSelectedExpiryTime(adjusted_start_time);
         } else {
-            setBrowsingExpiryTime('23:59:59');
-            setSelectedExpiryTime('23:59:59');
+            // For future dates, use stored expiry_time if available (e.g. market close time)
+            const futureTime = selected_expiry_time || '23:59:59';
+            setBrowsingExpiryTime(futureTime);
+            setSelectedExpiryTime(futureTime);
         }
     };
 
@@ -227,7 +230,7 @@ const DayInput = ({
                 readOnly
                 textAlignment='center'
                 name='time'
-                value={`${is_24_hours_contract ? browsing_expiry_time : '23:59:59'} GMT`}
+                value={`${browsing_expiry_time || '23:59:59'} GMT`}
                 disabled={!is_24_hours_contract}
                 onClick={() => {
                     setOpenTimePicker(true);
@@ -242,7 +245,7 @@ const DayInput = ({
                     <Localize i18n_default_text='Expiry' />
                 </Text>
                 <Text size='sm'>{`
-                ${formatted_date}, ${is_selected_date_today ? browsing_expiry_time : '23:59:59'} GMT`}</Text>
+                ${formatted_date}, ${browsing_expiry_time || '23:59:59'} GMT`}</Text>
             </div>
             <ActionSheet.Root
                 isOpen={open || open_timepicker}
