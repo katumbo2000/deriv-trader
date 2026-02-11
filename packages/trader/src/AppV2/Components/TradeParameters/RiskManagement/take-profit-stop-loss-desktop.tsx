@@ -54,14 +54,20 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
 
     const decimals = getDecimalPlaces(currency);
 
+    // Extract primitive min/max values during render so MobX tracks deep property access
+    // and React's useEffect can detect changes via primitive comparison
+    const contract_type_keys = Object.keys(validation_params);
+    const tp_params = contract_type_keys.length > 0 ? validation_params[contract_type_keys[0]]?.take_profit : undefined;
+    const sl_params = contract_type_keys.length > 0 ? validation_params[contract_type_keys[0]]?.stop_loss : undefined;
+
     const [tp_state, setTpState] = React.useState<TFieldState>({
         is_enabled: has_take_profit,
         input_value: take_profit || '',
         error_text: '',
         fe_error_text: '',
         max_length: calculateMaxLength(take_profit || '', decimals),
-        min_value: '',
-        max_value: '',
+        min_value: tp_params?.min || '',
+        max_value: tp_params?.max || '',
     });
 
     const [sl_state, setSlState] = React.useState<TFieldState>({
@@ -70,36 +76,30 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
         error_text: '',
         fe_error_text: '',
         max_length: calculateMaxLength(stop_loss || '', decimals),
-        min_value: '',
-        max_value: '',
+        min_value: sl_params?.min || '',
+        max_value: sl_params?.max || '',
     });
 
     const tp_input_ref = React.useRef<HTMLInputElement>(null);
     const sl_input_ref = React.useRef<HTMLInputElement>(null);
 
-    // Get validation params
+    // Update min/max when validation params change - uses primitive deps for reliable React effect triggering
     React.useEffect(() => {
-        const contract_types = Object.keys(validation_params);
-        if (contract_types.length > 0) {
-            const tp_params = validation_params[contract_types[0]]?.take_profit;
-            const sl_params = validation_params[contract_types[0]]?.stop_loss;
-
-            if (tp_params) {
-                setTpState(prev => ({
-                    ...prev,
-                    min_value: tp_params.min || '',
-                    max_value: tp_params.max || '',
-                }));
-            }
-            if (sl_params) {
-                setSlState(prev => ({
-                    ...prev,
-                    min_value: sl_params.min || '',
-                    max_value: sl_params.max || '',
-                }));
-            }
+        if (tp_params) {
+            setTpState(prev => ({
+                ...prev,
+                min_value: tp_params.min || '',
+                max_value: tp_params.max || '',
+            }));
         }
-    }, [validation_params]);
+        if (sl_params) {
+            setSlState(prev => ({
+                ...prev,
+                min_value: sl_params.min || '',
+                max_value: sl_params.max || '',
+            }));
+        }
+    }, [tp_params?.min, tp_params?.max, sl_params?.min, sl_params?.max]);
 
     // Scroll handling for virtual keyboard
     const tp_input_id = 'tp_input_desktop';

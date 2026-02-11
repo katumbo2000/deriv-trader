@@ -72,32 +72,33 @@ const TakeProfitInputDesktop = observer(({ onClose, is_open }: TTakeProfitInputD
 
     const decimals = getDecimalPlaces(currency);
 
+    // Extract primitive min/max values during render so MobX tracks deep property access
+    // and React's useEffect can detect changes via primitive comparison
+    const contract_type_keys = Object.keys(validation_params);
+    const tp_params = contract_type_keys.length > 0 ? validation_params[contract_type_keys[0]]?.take_profit : undefined;
+
     const initial_state: TTakeProfitState = {
         is_enabled: has_take_profit,
         input_value: take_profit || '',
         error_text: '',
         fe_error_text: '',
         max_length: calculateMaxLength(take_profit || '', decimals),
-        min_value: '',
-        max_value: '',
+        min_value: tp_params?.min || '',
+        max_value: tp_params?.max || '',
     };
 
     const [state, dispatch] = React.useReducer(reducer, initial_state);
     const input_ref = React.useRef<HTMLInputElement>(null);
 
-    // Get validation params for take profit
+    // Update min/max when validation params change - uses primitive deps for reliable React effect triggering
     React.useEffect(() => {
-        const contract_types = Object.keys(validation_params);
-        if (contract_types.length > 0) {
-            const tp_params = validation_params[contract_types[0]]?.take_profit;
-            if (tp_params) {
-                dispatch({
-                    type: 'SET_MIN_MAX',
-                    payload: { min: tp_params.min || '', max: tp_params.max || '' },
-                });
-            }
+        if (tp_params) {
+            dispatch({
+                type: 'SET_MIN_MAX',
+                payload: { min: tp_params.min || '', max: tp_params.max || '' },
+            });
         }
-    }, [validation_params]);
+    }, [tp_params?.min, tp_params?.max]);
 
     // Scroll the page when a virtual keyboard pops up
     const input_id = 'take_profit_input';
