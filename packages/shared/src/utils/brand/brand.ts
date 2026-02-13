@@ -60,6 +60,9 @@ export const getPlatformLogo = () => {
 };
 
 export const getPlatformHostname = () => {
+    if (typeof window !== 'undefined' && window.location.hostname === config_data.platform.hostname.beta) {
+        return config_data.platform.hostname.beta;
+    }
     if (isProductionEnvironment()) {
         return config_data.platform.hostname.production;
     } else if (process.env.NODE_ENV === 'staging') {
