@@ -5,6 +5,7 @@ $TABS_HEIGHT: var(--core-size-2400);
     background-color: var(--semantic-color-slate-solid-surface-frame-mid);
     position: relative;
     padding-bottom: var(--core-spacing-2800);
+    overflow: hidden;
 
     .tab-list--container {
         display: block;
@@ -51,7 +52,6 @@ $TABS_HEIGHT: var(--core-size-2400);
 
         &-content {
             height: calc(100% - $TABS_HEIGHT);
-            overflow-y: hidden;
 
             & > div {
                 height: 100%;
