@@ -16,7 +16,6 @@ The `@deriv/shared` package serves as the foundational utility library for the e
 - **Storage Management**: LocalStorage and SessionStorage utilities
 - **URL & Routing**: URL manipulation and routing helpers
 - **Contract Utilities**: Trading contract-specific helper functions
-- **Analytics Integration**: Advanced analytics tracking with caching and error monitoring
 - **Shortcode Processing**: Contract shortcode parsing and extraction utilities
 - **Type Definitions**: Shared TypeScript types and interfaces
 

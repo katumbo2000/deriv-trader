@@ -28,7 +28,6 @@ import {
     removeBarrier,
     routes,
     setLimitOrderBarriers,
-    trackAnalyticsEvent,
     TRADE_TYPES,
     WS,
 } from '@deriv/shared';
@@ -404,11 +403,6 @@ export default class PortfolioStore extends BaseStore {
                     contractSold(this.root_store.client.currency, response.sell.sold_for, Money)
                 );
             }
-
-            trackAnalyticsEvent('ce_reports_form_v2', {
-                action: 'close_contract',
-                platform: 'DTrader',
-            });
         }
     }
 

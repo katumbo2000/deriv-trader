@@ -46,7 +46,6 @@ describe('initStore', () => {
             'common',
             'modules',
             'ui',
-            'gtm',
             'notifications',
             'contract_replay',
             'contract_trade',

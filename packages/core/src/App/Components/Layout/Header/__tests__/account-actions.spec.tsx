@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { trackAnalyticsEvent } from '@deriv/shared';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,7 +10,6 @@ import { AccountActions } from '../account-actions';
 jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
     getBrandUrl: jest.fn(() => 'https://deriv.com'),
-    trackAnalyticsEvent: jest.fn(),
 }));
 
 const mockUseDerivativesAccount = jest.fn(() => ({
@@ -226,54 +224,6 @@ describe('AccountActions component', () => {
         await userEvent.click(try_real_button);
 
         expect(toggleTryRealModal).toHaveBeenCalledWith(true);
-    });
-
-    describe('Analytics tracking', () => {
-        it('should track analytics event with "deposit" button_type for deposit button', async () => {
-            renderWithStore();
-
-            await screen.findByTestId('dt_account_info');
-            const deposit_button = screen.getByRole('button', { name: /deposit/i });
-            await userEvent.click(deposit_button);
-
-            expect(trackAnalyticsEvent).toHaveBeenCalledWith('ce_trade_types_form_v2', {
-                action: 'click',
-                button_type: 'deposit',
-            });
-        });
-
-        it('should track analytics event with "try_real" button_type for Try real button', async () => {
-            // Mock useDerivativesAccount to return only demo accounts
-            mockUseDerivativesAccount.mockReturnValue({
-                data: {
-                    data: [{ account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' }],
-                },
-                isLoading: false,
-                error: null,
-                refetch: jest.fn(),
-            });
-
-            const toggleTryRealModal = jest.fn();
-
-            renderWithStore({
-                client: {
-                    ...default_mock_store.client,
-                    is_virtual: true,
-                },
-                ui: {
-                    toggleTryRealModal,
-                },
-            });
-
-            await screen.findByTestId('dt_account_info');
-            const try_real_button = screen.getByRole('button', { name: /try real/i });
-            await userEvent.click(try_real_button);
-
-            expect(trackAnalyticsEvent).toHaveBeenCalledWith('ce_trade_types_form_v2', {
-                action: 'click',
-                button_type: 'try_real',
-            });
-        });
     });
 
     describe('Bridge events', () => {

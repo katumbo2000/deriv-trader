@@ -37,7 +37,6 @@ jest.mock('@deriv-com/translations', () => ({
 
 jest.mock('@deriv/quill-icons', () => ({
     ...jest.requireActual('@deriv/quill-icons'),
-    DerivProductBrandLightDerivTraderLogoIcon: () => 'DerivProductBrandLightDerivTraderLogoIcon',
     LabelPairedLifeRingSmRegularIcon: () => 'LabelPairedLifeRingSmRegularIcon',
     LegacyHomeNewIcon: () => 'LegacyHomeNewIcon',
     LegacyMinimize2pxIcon: () => 'LegacyMinimize2pxIcon',
@@ -101,7 +100,7 @@ describe('<Sidebar />', () => {
 
     it('should render the sidebar with logo', () => {
         renderSidebar();
-        expect(screen.getByText('DerivProductBrandLightDerivTraderLogoIcon')).toBeInTheDocument();
+        expect(screen.getByTestId('dt_sidebar_brand_logo')).toBeInTheDocument();
     });
 
     it('should render Home button for all users', () => {

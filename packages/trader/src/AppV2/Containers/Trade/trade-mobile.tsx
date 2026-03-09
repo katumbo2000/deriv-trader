@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useLocalStorageData } from '@deriv/api';
 import { Loading } from '@deriv/components';
-import { getSymbolDisplayName, trackAnalyticsEvent } from '@deriv/shared';
+import { getSymbolDisplayName } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
 import AccumulatorStats from 'AppV2/Components/AccumulatorStats';
@@ -89,10 +89,6 @@ const Trade = observer(() => {
                     name: 'contract_type',
                     value: selected_trade_type?.value,
                 },
-            });
-            trackAnalyticsEvent('ce_trade_types_form_v2', {
-                action: 'select_trade_type',
-                trade_type_name: selected_trade_type?.text || '',
             });
         },
         [trade_types, onChange]

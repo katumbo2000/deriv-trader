@@ -11,7 +11,6 @@ import {
     toMoment,
 } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
-import { Analytics } from '@deriv-com/analytics';
 import { useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 

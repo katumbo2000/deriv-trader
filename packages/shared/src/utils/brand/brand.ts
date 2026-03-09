@@ -59,6 +59,27 @@ export const getPlatformLogo = () => {
     return config_data.platform.logo;
 };
 
+// [AI]
+export const getBrandLogoDark = (): string => {
+    return (
+        ((config_data as Record<string, unknown> & typeof config_data).brand_logo_dark as string) ??
+        config_data.brand_logo
+    );
+};
+
+export const getPlatformDescription = (): string => {
+    return ((config_data.platform as Record<string, unknown>).description as string) ?? '';
+};
+
+export const getAppId = (): number => {
+    const app_id = (config_data as Record<string, unknown> & typeof config_data).app_id as
+        | { staging: number; production: number }
+        | undefined;
+    if (!app_id) return 16929;
+    return isProduction() ? app_id.production : app_id.staging;
+};
+// [/AI]
+
 export const getDomainName = () => {
     if (typeof window === 'undefined') return '';
     const hostname = window.location.hostname;

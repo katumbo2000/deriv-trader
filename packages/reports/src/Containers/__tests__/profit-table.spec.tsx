@@ -5,7 +5,7 @@ import ProfitTable, { getRowAction } from '../profit-table';
 import { mockStore } from '@deriv/stores';
 import ReportsProviders from '../../reports-providers';
 import { useReportsStore } from 'Stores/useReportsStores';
-import { extractInfoFromShortcode, formatDate, getUnsupportedContracts, trackAnalyticsEvent } from '@deriv/shared';
+import { extractInfoFromShortcode, formatDate, getUnsupportedContracts } from '@deriv/shared';
 import { useDevice } from '@deriv-com/ui';
 
 const mockData = [
@@ -96,7 +96,6 @@ jest.mock('@deriv/components', () => ({
 
 jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
-    trackAnalyticsEvent: jest.fn(),
     WS: {
         forgetAll: jest.fn(),
         wait: jest.fn(),

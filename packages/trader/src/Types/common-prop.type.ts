@@ -32,7 +32,6 @@ export type TRootStore = {
     common: TCoreStores['common'];
     modules: ModulesStore;
     ui: TCoreStores['ui'];
-    gtm: TCoreStores['gtm'];
     notifications: TCoreStores['notifications'];
     contract_replay: TCoreStores['contract_replay'];
     contract_trade: TCoreStores['contract_trade'];

@@ -7,6 +7,9 @@ inputs:
   CLOUDFLARE_API_TOKEN:
     description: 'Cloudflare token'
     required: true
+  CLOUDFLARE_PROJECT_NAME:
+    description: 'Cloudflare Pages project name'
+    required: true
 runs:
   using: composite
   steps:
@@ -17,6 +20,6 @@ runs:
     run: |
       npm i wrangler@3.1.0
       cd packages/core
-      npx wrangler pages deploy dist/ --project-name=derivatives-trader --branch=staging
-      echo "New staging website - http://staging.derivatives-trader.pages.dev"
+      npx wrangler pages deploy dist/ --project-name=${{ inputs.CLOUDFLARE_PROJECT_NAME }} --branch=staging
+      echo "New staging website - https://staging.${{ inputs.CLOUDFLARE_PROJECT_NAME }}.pages.dev"
     shell: bash

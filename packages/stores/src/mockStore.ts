@@ -422,18 +422,6 @@ const mock = (): TStores & { is_mock: boolean } => {
             unmount: jest.fn(),
             cleanup: jest.fn(),
         },
-        gtm: {
-            is_gtm_applicable: false,
-            visitorId: 'visitorId',
-            common_variables: {
-                language: 'en',
-                theme: 'dark',
-                platform: 'DBot',
-                loggedIn: false,
-            },
-            pushDataLayer: jest.fn(),
-            pushTransactionData: jest.fn(),
-        },
         contract_replay: {
             contract_store: {
                 accumulator_previous_spot_time: null,

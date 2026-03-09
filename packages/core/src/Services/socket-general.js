@@ -6,7 +6,7 @@ import WS from './ws-methods';
 import ServerTime from '_common/base/server_time';
 import BinarySocket from '_common/base/socket_base';
 
-let client_store, common_store, gtm_store;
+let client_store, common_store;
 
 // TODO: update commented statements to the corresponding functions from app
 const BinarySocketGeneral = (() => {
@@ -39,11 +39,8 @@ const BinarySocketGeneral = (() => {
             const error = new Error('deriv-api: no message received after 30s');
             error.userId = client_store?.loginid;
 
-            window.TrackJS?.console?.error({
-                message: error.message,
-                websocketUrl: getSocketURL(),
-                pendingResponseTypes,
-            });
+            // eslint-disable-next-line no-console
+            console.error(error.message, { websocketUrl: getSocketURL(), pendingResponseTypes });
         }, 30000);
 
         if (is_ready) {
@@ -73,9 +70,6 @@ const BinarySocketGeneral = (() => {
                         authorizeAccount(response);
                     }
                 }
-                break;
-            case 'transaction':
-                gtm_store.pushTransactionData(response);
                 break;
             // no default
         }
@@ -125,7 +119,6 @@ const BinarySocketGeneral = (() => {
     const init = store => {
         client_store = store.client;
         common_store = store.common;
-        gtm_store = store.gtm;
 
         return {
             onDisconnect,

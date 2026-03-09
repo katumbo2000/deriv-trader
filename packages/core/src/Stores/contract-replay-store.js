@@ -1,7 +1,7 @@
 import { action, makeObservable, observable, override, when } from 'mobx';
 
 import { Money } from '@deriv/components';
-import { contractCancelled, contractSold, isEmptyObject, trackAnalyticsEvent, WS } from '@deriv/shared';
+import { contractCancelled, contractSold, isEmptyObject, WS } from '@deriv/shared';
 import { localize } from '@deriv-com/translations';
 
 import BaseStore from './base-store';
@@ -275,11 +275,6 @@ export default class ContractReplayStore extends BaseStore {
             this.root_store.notifications.addNotificationMessage(
                 contractSold(this.root_store.client.currency, response.sell.sold_for, Money)
             );
-
-            trackAnalyticsEvent('ce_reports_form_v2', {
-                action: 'close_contract',
-                platform: 'DTrader',
-            });
         }
     }
 

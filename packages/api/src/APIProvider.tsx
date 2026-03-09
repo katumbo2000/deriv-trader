@@ -2,7 +2,7 @@ import React, { createContext, PropsWithChildren, useCallback, useContext, useEf
 
 // @ts-expect-error `@deriv/deriv-api` is not in TypeScript, Hence we ignore the TS error.
 import DerivAPIBasic from '@deriv/deriv-api/dist/DerivAPIBasic';
-import { getAccountType, getApiCoreBaseUrl, getBrandName, getSocketURL, useWS } from '@deriv/shared';
+import { getAccountType, getApiCoreBaseUrl, getAppId, getBrandName, getSocketURL, useWS } from '@deriv/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import {
@@ -79,8 +79,10 @@ const getSharedQueryClientContext = (): QueryClient => {
 const getWebSocketURL = () => {
     const endpoint = getSocketURL();
     const brand = getBrandName().toLowerCase();
-    // TODO remove hardcoded app_id in future
-    const wss_url = `wss://${endpoint}/websockets/v3?app_id=16929&brand=${brand}`;
+    // [AI]
+    const app_id = getAppId();
+    // [/AI]
+    const wss_url = `wss://${endpoint}/websockets/v3?app_id=${app_id}&brand=${brand}`;
 
     return wss_url;
 };

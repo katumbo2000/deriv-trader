@@ -16,7 +16,6 @@ The `@deriv/trader` package is the main trading application for Deriv's derivati
 - **Risk Management**: Stop Loss, Take Profit, and Deal Cancellation features
 - **Mobile-First V2**: Swipeable interfaces, touch-optimized controls, and responsive design
 - **State Management**: MobX-based reactive state management with persistence
-- **Analytics Integration**: Comprehensive tracking and user behavior analytics
 
 ## Architecture
 

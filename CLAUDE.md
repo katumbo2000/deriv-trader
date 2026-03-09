@@ -14,28 +14,7 @@ A comprehensive TypeScript/React-based derivatives trading platform built with M
 **Main Tech Stack:** React 18, MobX 6, TypeScript 5, Webpack 5, Jest 29
 **Build System:** Webpack with separate configs per package
 **Architecture Pattern:** Multi-store reactive state management + component-driven UI
-
-## AI Code Generation Rules (CRITICAL)
-
-**When generating ANY code, you MUST wrap it with AI markers:**
-
-```typescript
-function exampleFunction() {
-    // Your AI-generated code here
-    return 'This is AI generated';
-}
-```
-
-**Rules:**
-
-- ALWAYS wrap AI-generated code with `[AI]` and `[/AI]` markers using appropriate comment syntax
-- NEVER nest AI markers inside existing AI blocks
-- NEVER add comments on the same line as markers
-- NEVER add markers to deleted code
-- Each function, class, or code block should have its own markers
-- This is required for productivity tracking - violations will break the build
-
----
+**Node Version:** 20.x (required — no `.nvmrc`, manage manually)
 
 ## Common Commands
 
@@ -102,12 +81,42 @@ npm run analyze:bundle --workspace=@deriv/core
 # Check for circular imports
 npm run check-imports
 
-# Generate color tokens
+# Generate color tokens (run after editing brand.config.json colors)
 npm run generate:colors
+
+# Validate white-label configuration
+npm run verify:whitelabel
 
 # Clean all node_modules (interactive)
 npm run clean
 ```
+
+---
+
+## White-Label Configuration
+
+This is a white-label template. All branding is driven by **`brand.config.json`** in the repo root — no source code changes needed for rebranding.
+
+### White-label workflow
+
+1. Edit `brand.config.json` (brand name, colors, API endpoints, hostnames, app IDs)
+2. Replace SVG logo files in `assets/brand/` (`brand-logo.svg`, `brand-logo-dark.svg`, `platform-logo.svg`)
+3. Run `npm run generate:colors` — regenerates SCSS tokens in `packages/shared/src/styles/`
+4. Run `npm run verify:whitelabel` — validates config and logo files
+5. Run `npm run build:all`
+
+**Never edit the generated SCSS files directly** — they are overwritten by `generate:colors`:
+
+- `packages/shared/src/styles/constants/colors.scss`
+- `packages/shared/src/styles/tokens/brand.scss`
+- `packages/shared/src/styles/tokens/semantic.scss`
+- `packages/shared/src/styles/tokens/components.scss`
+
+### App ID
+
+The platform connects to the Deriv WebSocket API (v3). Register your own App ID at [https://developers.deriv.com](https://developers.deriv.com) and set it in `brand.config.json` under `app_id.staging` and `app_id.production`.
+
+For full details, see [WHITE_LABEL.md](WHITE_LABEL.md).
 
 ---
 
@@ -134,8 +143,7 @@ RootStore (root)
 ├── contract_trade: ContractTradeStore  # Contract state
 ├── contract_replay: ContractReplayStore # Replay functionality
 ├── chart_barrier_store: ChartBarrierStore  # Chart barrier management
-├── traders_hub: TradersHubStore # Hub/dashboard state
-└── gtm: GTMStore               # Analytics tracking
+└── traders_hub: TradersHubStore # Hub/dashboard state
 ```
 
 ### Base Store Pattern
@@ -382,7 +390,6 @@ src/
 │   ├── form-error-messages.js
 │   └── routes-config.js
 └── Utils/
-    ├── Analytics.ts             # DataDog + custom tracking
     └── PWA.ts                   # Service worker setup
 ```
 
@@ -610,7 +617,6 @@ export type {
 - Contract type utilities (`CONTRACT_TYPES`, `isHighLow()`, etc.)
 - Validators (`Validator` class for form validation)
 - Route helpers (`routes` constants, `moduleLoader`)
-- Analytics (`trackAnalyticsEvent()`)
 - Money formatting
 - URL parameter handling
 
@@ -1356,22 +1362,6 @@ NODE_ENV=production
 2. **Asset hashing** - `[contenthash]` for long-term caching
 3. **Source maps** - Minified with production maps
 4. **CDN delivery** - Distributed charts + assets
-
-### Analytics Integration
-
-**DataDog RUM:**
-
-```typescript
-import '@datadog/browser-rum';
-
-// Configured in @deriv/core
-```
-
-**Custom Analytics:**
-
-```typescript
-trackAnalyticsEvent('buy_contract', { symbol: 'EURUSD', amount: 10 });
-```
 
 ---
 

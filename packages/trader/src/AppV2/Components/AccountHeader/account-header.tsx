@@ -6,7 +6,7 @@ import { useDerivativesAccount, useMobileBridge } from '@deriv/api';
 import { Button, Skeleton, Text } from '@deriv/components';
 import AccountSwitcher from '@deriv/core/src/App/Components/Layout/Header/account-switcher';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
-import { addComma, getBrandUrl, getCurrencyDisplayCode, redirectToLogin, trackAnalyticsEvent } from '@deriv/shared';
+import { addComma, getBrandUrl, getCurrencyDisplayCode, redirectToLogin } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
@@ -97,14 +97,6 @@ const AccountHeader = observer(
         const buttonType = hasOnlyDemoAccounts ? 'try_real' : 'deposit';
 
         const handleTransferClick = () => {
-            // Track analytics event
-            const eventName = 'ce_trade_types_form_v2';
-
-            trackAnalyticsEvent(eventName, {
-                action: 'click',
-                button_type: buttonType,
-            });
-
             if (hasOnlyDemoAccounts) {
                 // Show modal instead of redirecting directly
                 ui.toggleTryRealModal(true);

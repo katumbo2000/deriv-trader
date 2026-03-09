@@ -5,7 +5,6 @@ import { createRoot } from 'react-dom/client';
 
 import App from 'App/app.jsx';
 import initStore from 'App/initStore';
-import { AnalyticsInitializer } from 'Utils/Analytics';
 // eslint-disable-next-line
 import registerServiceWorker from 'Utils/PWA';
 
@@ -28,7 +27,6 @@ const initApp = async () => {
     if (wrapper) {
         const root = createRoot(wrapper);
         root.render(<App root_store={root_store} />);
-        AnalyticsInitializer();
     }
 };
 

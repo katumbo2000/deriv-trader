@@ -29,5 +29,3 @@ export * from './utils/url';
 export * from './utils/validation';
 export * from './utils/validator';
 export * from './utils/error-mapping';
-export { default as cacheTrackEvents } from './utils/analytics/analytics';
-export * from './utils/analytics/analytics-utils';

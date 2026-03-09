@@ -42,7 +42,6 @@ import {
     isVanillaFxContract,
     TContractInfo,
     toGMTFormat,
-    trackAnalyticsEvent,
 } from '@deriv/shared';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
@@ -166,13 +165,6 @@ const ContractDetails = ({
         if (isCancellationExpired(contract_info)) return localize('Deal cancellation (expired)');
         return localize('Deal cancellation (active)');
     };
-
-    React.useEffect(() => {
-        trackAnalyticsEvent('ce_reports_form_v2', {
-            action: 'open_contract_details',
-            platform: 'DTrader',
-        });
-    }, []);
 
     return (
         <ThemedScrollbars is_bypassed={isMobile}>

@@ -9,16 +9,13 @@ import {
     getAccountType,
     getTrustedDomainName,
     isCryptocurrency,
-    isMobile,
     LocalStore,
     removeCookies,
     routes,
     SessionStore,
     urlForLanguage,
 } from '@deriv/shared';
-import { Analytics } from '@deriv-com/analytics';
 import { getInitialLanguage, localize } from '@deriv-com/translations';
-import { CountryUtils } from '@deriv-com/utils';
 
 import { checkWhoAmI, requestRestLogout, WS } from 'Services';
 
@@ -367,15 +364,6 @@ export default class ClientStore extends BaseStore {
 
         this.external_id = external_id;
 
-        // Analytics and GTM for logged-in users
-        if (this.is_logged_in) {
-            Analytics.identifyEvent(external_id || this.user_id);
-
-            await this.root_store.gtm.pushDataLayer({
-                event: 'login',
-            });
-        }
-
         // Handle redirect and language settings for logged-in users
         if (this.is_logged_in) {
             if (redirect_url) {
@@ -497,40 +485,6 @@ export default class ClientStore extends BaseStore {
         this.loginid = loginid;
     }
 
-    async getAnalyticsConfig(isLoggedOut = false) {
-        const broker = this.loginid?.match(/[a-zA-Z]+/g)?.join('');
-
-        const ppc_campaign_cookies =
-            Cookies.getJSON('utm_data') === 'null'
-                ? {
-                      utm_source: 'no source',
-                      utm_medium: 'no medium',
-                      utm_campaign: 'no campaign',
-                      utm_content: 'no content',
-                  }
-                : Cookies.getJSON('utm_data');
-
-        const residence_country = !isLoggedOut ? this.residence : '';
-        const login_status = !isLoggedOut && this.is_logged_in;
-        return {
-            loggedIn: login_status,
-            account_type: broker === 'null' ? 'unlogged' : broker,
-            residence_country,
-            device_type: isMobile() ? 'mobile' : 'desktop',
-            language: getInitialLanguage(),
-            device_language: navigator?.language || 'en-EN',
-            user_language: getInitialLanguage().toLowerCase(),
-            country: await CountryUtils.getCountry(),
-            utm_source: ppc_campaign_cookies?.utm_source,
-            utm_medium: ppc_campaign_cookies?.utm_medium,
-            utm_campaign: ppc_campaign_cookies?.utm_campaign,
-            utm_content: ppc_campaign_cookies?.utm_content,
-            domain: window.location.hostname,
-            url: window.location.href,
-            ...(!isLoggedOut && this.external_id && { user_id: this.external_id }),
-        };
-    }
-
     setIsLoggingIn(bool) {
         this.is_logging_in = bool;
     }
@@ -582,12 +536,6 @@ export default class ClientStore extends BaseStore {
             LocalStore.setObject('notification_messages', { ...notification_messages });
         }
 
-        // Update analytics
-        const analytics_config = await this.getAnalyticsConfig(true);
-        Analytics.setAttributes(analytics_config);
-
-        this.root_store.gtm.pushDataLayer({ event: 'log_out' });
-
         // Reset state
         this.loginid = null;
         this.user_id = null;
@@ -603,8 +551,6 @@ export default class ClientStore extends BaseStore {
         // Clear account_id and account_type from localStorage
         clearAccountId();
         localStorage.removeItem('account_type');
-
-        Analytics.reset();
 
         runInAction(() => {
             // Since payout_currencies endpoint has been removed, use USD as default

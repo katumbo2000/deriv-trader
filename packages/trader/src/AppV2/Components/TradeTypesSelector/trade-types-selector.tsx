@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
 import TooltipPortal from '@deriv/components/src/components/tooltip-portal/tooltip-portal';
-import { trackAnalyticsEvent } from '@deriv/shared';
 import { Text } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 
@@ -113,10 +112,6 @@ const TradeTypesSelector = ({
                             className={`trade-types-selector__tab ${active_tab === 'all' ? 'trade-types-selector__tab--active' : ''}`}
                             onClick={() => {
                                 setActiveTab('all');
-                                trackAnalyticsEvent('ce_trade_types_form_v2', {
-                                    action: 'trade_types_tab_change',
-                                    tab: 'all',
-                                });
                             }}
                             role='tab'
                             aria-selected={active_tab === 'all'}
@@ -130,10 +125,6 @@ const TradeTypesSelector = ({
                             className={`trade-types-selector__tab ${active_tab === 'most_traded' ? 'trade-types-selector__tab--active' : ''}`}
                             onClick={() => {
                                 setActiveTab('most_traded');
-                                trackAnalyticsEvent('ce_trade_types_form_v2', {
-                                    action: 'trade_types_tab_change',
-                                    tab: 'most_traded',
-                                });
                             }}
                             role='tab'
                             aria-selected={active_tab === 'most_traded'}

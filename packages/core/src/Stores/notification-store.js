@@ -15,7 +15,6 @@ import {
     isMobile,
     isMultiplierContract,
     LocalStore,
-    trackAnalyticsEvent,
     unique,
 } from '@deriv/shared';
 import { Localize, localize } from '@deriv-com/translations';
@@ -461,13 +460,6 @@ export default class NotificationStore extends BaseStore {
     }
 
     toggleNotificationsModal() {
-        if (!this.is_notifications_visible) {
-            trackAnalyticsEvent('ce_notification_form_v2', {
-                action: 'open',
-                platform: 'DTrader',
-            });
-        }
-
         this.is_notifications_visible = !this.is_notifications_visible;
     }
 

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { LabelPairedChevronRightSmRegularIcon } from '@deriv/quill-icons';
-import { trackAnalyticsEvent } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { Button, Text } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
@@ -89,11 +88,6 @@ const Guide = observer(
                             color={is_dark_mode_on ? 'white' : 'black'}
                             className='trade__guide'
                             onClick={() => {
-                                trackAnalyticsEvent('ce_trade_types_form_v2', {
-                                    action: 'info_open',
-                                    trade_type_name: contract_type_title || contract_type,
-                                    source: 'trade_page',
-                                });
                                 setIsDescriptionOpened(true);
                             }}
                             variant='tertiary'
@@ -105,11 +99,6 @@ const Guide = observer(
                         <div
                             className='guide-link'
                             onClick={() => {
-                                trackAnalyticsEvent('ce_trade_types_form_v2', {
-                                    action: 'info_open',
-                                    trade_type_name: contract_type_title || contract_type,
-                                    source: 'trade_page',
-                                });
                                 setIsDescriptionOpened(true);
                             }}
                         >
@@ -127,11 +116,6 @@ const Guide = observer(
                     is_dark_mode_on={is_dark_mode_on}
                     is_open={is_description_opened}
                     onChipSelect={(id: string) => {
-                        const selected_trade_type = ordered_contract_list.find(item => item.id === id);
-                        trackAnalyticsEvent('ce_trade_types_form_v2', {
-                            action: 'info_switcher',
-                            trade_type_name: selected_trade_type?.id ?? '',
-                        });
                         onChipSelect(id);
                     }}
                     onClose={onClose}

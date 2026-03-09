@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { TCoreStores } from '@deriv/stores/types';
-import { formatDate, trackAnalyticsEvent } from '@deriv/shared';
+import { formatDate } from '@deriv/shared';
 import { useDevice } from '@deriv-com/ui';
 import { mockStore } from '@deriv/stores';
 import { useReportsStore } from 'Stores/useReportsStores';
@@ -71,7 +71,6 @@ jest.mock('Stores/useReportsStores', () => ({
 
 jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
-    trackAnalyticsEvent: jest.fn(),
     isMobile: jest.fn(() => false),
     WS: {
         forgetAll: jest.fn(),

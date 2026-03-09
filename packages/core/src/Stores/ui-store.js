@@ -515,8 +515,6 @@ export default class UIStore extends BaseStore {
     setDarkMode(is_dark_mode_on) {
         if (this.is_dark_mode_on !== is_dark_mode_on) {
             this.is_dark_mode_on = is_dark_mode_on;
-            // This GTM call is here instead of the GTM store due to frequency of use
-            this.root_store.gtm.pushDataLayer({ event: 'switch theme' });
         }
 
         return this.is_dark_mode_on;

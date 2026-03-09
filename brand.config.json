@@ -1,6 +1,7 @@
 {
     "brand_name": "Deriv",
-    "brand_logo": "BrandDerivLogoCoralIcon",
+    "brand_logo": "brand/platform-logo.svg",
+    "brand_logo_dark": "brand/platform-logo.svg",
     "brand_domains": ["deriv.com", "deriv.be", "deriv.me"],
     "brand_hostname": {
         "staging": "staging-home.deriv.com/dashboard",
@@ -8,7 +9,8 @@
     },
     "platform": {
         "name": "Derivatives Trader",
-        "logo": "IcRebrandingDerivTrader",
+        "description": "A whole new trading experience on a powerful yet easy to use platform.",
+        "logo": "brand/platform-logo.svg",
         "hostname": {
             "staging": "staging-dtrader.deriv.com",
             "beta": "beta-dtrader.deriv.com",
@@ -27,6 +29,10 @@
     "api": {
         "staging": "staging-api.deriv.com",
         "production": "api.deriv.com"
+    },
+    "app_id": {
+        "staging": 16929,
+        "production": 16929
     },
     "colors": {
         "primary": "#ff444f",

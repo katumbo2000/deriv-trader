@@ -158,9 +158,6 @@ describe('TradeStore', () => {
                 open_accu_contract: null,
                 active_positions: [],
             },
-            gtm: {
-                pushDataLayer: jest.fn(),
-            },
         }) as unknown as TRootStore;
 
         tradeStore = new TradeStore({ root_store: mockRootStore });

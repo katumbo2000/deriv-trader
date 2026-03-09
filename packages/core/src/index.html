@@ -130,26 +130,23 @@
         </script>
         <!-- End URL Handler -->
 
-        <meta
-            name="description"
-            content=" Deriv gives everyone an easy way to participate in the financial markets. Trade with as little as $1 USD on major currencies, stocks, indices, and commodities."
-        />
+        <meta name="description" content="<%= htmlWebpackPlugin.options.templateParameters.platform_description %>" />
         <meta
             name="keywords"
             content=" digital options, forex, forex trading, online trading, financial trading, binary trading, index trading, trading indices, forex trades, trading commodities, digital options strategy, binary broker, binary bet, digital options trading platform, binary strategy, finance, stocks, investment, trading"
         />
-        <meta name="author" content="Deriv" />
+        <meta name="author" content="<%= htmlWebpackPlugin.options.templateParameters.brand_name %>" />
         <!-- TODO: iOS zoom bug for input elements means we'll get a lower user accessibility score since we're not allowing dtrader.deriv.com to be scalable on mobile -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <meta name="theme-color" content="#414652" />
-        <meta name="dcterms.rightsHolder" content="Deriv" />
-        <meta name="dcterms.rights" content="Deriv" />
+        <meta name="dcterms.rightsHolder" content="<%= htmlWebpackPlugin.options.templateParameters.brand_name %>" />
+        <meta name="dcterms.rights" content="<%= htmlWebpackPlugin.options.templateParameters.brand_name %>" />
         <meta name="google-site-verification" content="g5u3TyEdmYJ_HKZ6EmpW1nlKwD4XPVeLMhN9leeMfuw" />
         <meta
             property="og:description"
-            content="Deriv gives everyone an easy way to participate in the financial markets. Trade with as little as $1 USD on major currencies, stocks, indices, and commodities."
+            content="<%= htmlWebpackPlugin.options.templateParameters.platform_description %>"
         />
-        <meta property="og:title" content="Deriv" />
+        <meta property="og:title" content="<%= htmlWebpackPlugin.options.templateParameters.platform_name %>" />
         <meta property="og:type" content="website" />
         <meta
             property="og:image"
@@ -159,13 +156,11 @@
         <meta name="referrer" content="origin" />
 
         <!-- Preconnect for critical resources (establishes early connections) -->
-        <link rel="preconnect" href="https://api-core.deriv.com" />
-        <link rel="preconnect" href="https://api.deriv.com" />
-        <link rel="preconnect" href="https://auth.deriv.com" />
+        <link rel="preconnect" href="<%= htmlWebpackPlugin.options.templateParameters.api_core_url %>" />
+        <link rel="preconnect" href="<%= htmlWebpackPlugin.options.templateParameters.api_url %>" />
+        <link rel="preconnect" href="<%= htmlWebpackPlugin.options.templateParameters.auth_url %>" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-
         <!-- Load all fonts in single request with all required weights and language subsets -->
         <!-- Includes weights: 300,400,500,700 | Subsets: Latin, Cyrillic (Russian), Vietnamese -->
         <link
@@ -186,10 +181,13 @@
             />
         </noscript>
 
-        <link rel="alternate" hreflang="en" href="https://dtrader.deriv.com" />
-        <link rel="canonical" href="https://dtrader.deriv.com" />
+        <link rel="alternate" hreflang="en" href="<%= htmlWebpackPlugin.options.templateParameters.canonical_url %>" />
+        <link rel="canonical" href="<%= htmlWebpackPlugin.options.templateParameters.canonical_url %>" />
 
-        <title>Deriv Trader | Deriv</title>
+        <title>
+            <%= htmlWebpackPlugin.options.templateParameters.platform_name %> | <%=
+            htmlWebpackPlugin.options.templateParameters.brand_name %>
+        </title>
         <meta charset="UTF-8" />
         <meta name="google-site-verification" content="g5u3TyEdmYJ_HKZ6EmpW1nlKwD4XPVeLMhN9leeMfuw" />
 
@@ -216,15 +214,5 @@
         <div id="modal_root" class="modal-root"></div>
         <!-- modal_root has background color. So, it cannot be used for toast messages. For those cases popup_root is used -->
         <div id="popup_root" class="popup-root"></div>
-
-        <!-- GTM NoScript fallback (inline required for users with JS disabled) -->
-        <noscript
-            ><iframe
-                src="https://www.googletagmanager.com/ns.html?id=GTM-NF7884S"
-                height="0"
-                width="0"
-                style="display: none; visibility: hidden"
-            ></iframe
-        ></noscript>
     </body>
 </html>

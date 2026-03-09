@@ -31,7 +31,7 @@ const LiveChat = observer(({ showPopover }: { showPopover?: boolean }) => {
                         zIndex='9999'
                     >
                         <LegacyLiveChatOutlineIcon
-                            className='footer__icon gtm-deriv-livechat'
+                            className='footer__icon'
                             iconSize='sm'
                             fill='var(--color-text-primary)'
                         />
@@ -39,7 +39,7 @@ const LiveChat = observer(({ showPopover }: { showPopover?: boolean }) => {
                 ) : (
                     <div className='footer__link'>
                         <LegacyLiveChatOutlineIcon
-                            className='footer__icon gtm-deriv-livechat'
+                            className='footer__icon'
                             iconSize='sm'
                             fill='var(--color-text-primary)'
                         />
@@ -49,7 +49,7 @@ const LiveChat = observer(({ showPopover }: { showPopover?: boolean }) => {
         );
 
     return (
-        <div className='livechat gtm-deriv-livechat' onKeyDown={liveChatClickHandler} onClick={liveChatClickHandler}>
+        <div className='livechat' onKeyDown={liveChatClickHandler} onClick={liveChatClickHandler}>
             <div className='livechat__icon-wrapper'>
                 <LegacyLiveChatOutlineIcon className='livechat__icon' iconSize='sm' fill='var(--color-text-primary)' />
             </div>

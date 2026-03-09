@@ -1,13 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import {
-    formatMoney,
-    getCurrencyDisplayCode,
-    getDecimalPlaces,
-    mapErrorMessage,
-    trackAnalyticsEvent,
-} from '@deriv/shared';
+import { formatMoney, getCurrencyDisplayCode, getDecimalPlaces, mapErrorMessage } from '@deriv/shared';
 import { Button, Text, TextField, ToggleSwitch, useSnackbar } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
@@ -329,11 +323,6 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
             ...(tp_state.is_enabled || sl_state.is_enabled ? { has_cancellation: false } : {}),
         });
 
-        trackAnalyticsEvent('ce_trade_types_form_v2', {
-            action: 'customizing_trades',
-            input_method: 'custom',
-            parameter_type: 'take_profit_stop_loss',
-        });
         onClose();
     };
 

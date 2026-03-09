@@ -7,13 +7,10 @@ import {
     getCardLabelsV2,
     getContractTypeDisplay,
     getIndicativePrice,
-    getMarketName,
-    getTradeTypeName,
     hasContractEntered,
     isAccumulatorContract,
     isOpen,
     isValidToSell,
-    trackAnalyticsEvent,
 } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Button, useNotifications, useSnackbar } from '@deriv-com/quill-ui';
@@ -121,20 +118,6 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
         contract_id: number,
         specific_contract_type: string
     ) => {
-        // Track run_contract analytics event directly
-        const selected_trade_type = trade_types_list.find(({ value }) => value === contract_type);
-        const trade_type_name = selected_trade_type?.text || contract_type;
-        const market_type_name = getMarketName(symbol) || symbol;
-        const contract_type_display = getTradeTypeName(specific_contract_type) || '';
-
-        trackAnalyticsEvent('ce_contracts_set_up_form_v2', {
-            action: 'run_contract',
-            trade_type_name,
-            market_type_name,
-            contract_id,
-            contract_type: contract_type_display,
-        });
-
         return addBanner({
             icon: (
                 <StandaloneStopwatchRegularIcon

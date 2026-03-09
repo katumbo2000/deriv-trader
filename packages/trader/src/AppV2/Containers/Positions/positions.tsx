@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import { useLocalStorageData, useMobileBridge } from '@deriv/api';
-import { getPositionsV2TabIndexFromURL, routes, trackAnalyticsEvent } from '@deriv/shared';
+import { getPositionsV2TabIndexFromURL, routes } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Tab } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
@@ -55,10 +55,6 @@ const Positions = observer(() => {
     React.useEffect(() => {
         if (analyticsCalledRef.current) return;
         analyticsCalledRef.current = true;
-        trackAnalyticsEvent('ce_reports_form_v2', {
-            action: 'open',
-            platform: 'DTrader',
-        });
     }, []);
 
     React.useEffect(() => {

@@ -36,16 +36,9 @@ const RemovedRoutesRedirect = () => {
 };
 
 const BinaryRoutes = observer(props => {
-    const { ui, gtm } = useStore();
+    const { ui } = useStore();
     const { promptFn, prompt_when } = ui;
-    const { pushDataLayer } = gtm;
-    const location = useLocation();
     const { isMobile } = useDevice();
-
-    React.useEffect(() => {
-        pushDataLayer({ event: 'page_load' });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location]);
 
     return (
         <React.Suspense fallback={isMobile ? <SmartFallbackLoader /> : <Loading />}>

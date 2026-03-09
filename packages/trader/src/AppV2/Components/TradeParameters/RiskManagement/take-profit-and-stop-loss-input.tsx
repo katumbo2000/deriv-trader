@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
-import { getCurrencyDisplayCode, getDecimalPlaces, mapErrorMessage, trackAnalyticsEvent } from '@deriv/shared';
+import { getCurrencyDisplayCode, getDecimalPlaces, mapErrorMessage } from '@deriv/shared';
 import { ActionSheet, CaptionText, Text, TextFieldWithSteppers, ToggleSwitch } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
@@ -213,11 +213,6 @@ const TakeProfitAndStopLossInput = ({
                       stop_loss: error_text || new_input_value === '0' ? '' : new_input_value,
                   }),
             ...(is_tp_enabled ? { has_cancellation: false } : {}),
-        });
-        trackAnalyticsEvent('ce_trade_types_form_v2', {
-            action: 'customizing_trades',
-            input_method: 'custom',
-            parameter_type: type,
         });
         onActionSheetClose();
     };

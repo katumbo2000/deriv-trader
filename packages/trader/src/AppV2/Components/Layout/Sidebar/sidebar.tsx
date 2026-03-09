@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { useMobileBridge } from '@deriv/api';
 import { Button, Flyout, Text } from '@deriv/components';
 import {
-    DerivProductBrandLightDerivTraderLogoIcon,
     LabelPairedLifeRingSmRegularIcon,
     LegacyHomeNewIcon,
     StandaloneCircleUserFillIcon,
@@ -18,7 +17,9 @@ import {
     StandaloneMoonRegularIcon,
     StandaloneSunBrightRegularIcon,
 } from '@deriv/quill-icons';
-import { getBrandUrl, getHelpCentreUrl, routes } from '@deriv/shared';
+// [AI]
+import { getBrandLogo, getBrandLogoDark, getBrandName, getBrandUrl, getHelpCentreUrl, routes } from '@deriv/shared';
+// [/AI]
 import { observer, useStore } from '@deriv/stores';
 import { Localize, localize, useTranslations } from '@deriv-com/translations';
 
@@ -226,7 +227,15 @@ const Sidebar = observer(() => {
             >
                 {/* Logo Section */}
                 <div className='sidebar__header'>
-                    <DerivProductBrandLightDerivTraderLogoIcon width={32} height={32} />
+                    {/* [AI] */}
+                    <img
+                        src={`/${is_dark_mode_on ? getBrandLogoDark() : getBrandLogo()}`}
+                        alt={getBrandName()}
+                        width={32}
+                        height={32}
+                        data-testid='dt_sidebar_brand_logo'
+                    />
+                    {/* [/AI] */}
                 </div>
                 <div className='sidebar__separator' />
                 {/* Main Navigation */}

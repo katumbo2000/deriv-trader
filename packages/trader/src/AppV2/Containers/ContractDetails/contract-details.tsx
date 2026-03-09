@@ -10,7 +10,6 @@ import {
     isValidToCancel,
     isValidToSell,
     TContractStore,
-    trackAnalyticsEvent,
     WS,
 } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
@@ -59,13 +58,6 @@ const ContractDetails = observer(() => {
     React.useEffect(() => {
         requestUpdatedHistory(contract_id);
     }, [contract_id, take_profit?.order_amount, stop_loss?.order_amount, requestUpdatedHistory]);
-
-    React.useEffect(() => {
-        trackAnalyticsEvent('ce_reports_form_v2', {
-            action: 'open_contract_details',
-            platform: 'DTrader',
-        });
-    }, []);
 
     if (is_loading) return <Loading.DTraderV2 is_contract_details />;
 

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { getCurrencyDisplayCode, trackAnalyticsEvent } from '@deriv/shared';
+import { getCurrencyDisplayCode } from '@deriv/shared';
 import { Localize } from '@deriv-com/translations';
 
 import { TabSelector } from 'AppV2/Components/InputPopover';
@@ -33,12 +33,6 @@ const StakePopoverContent: React.FC<{
     const handleChipSelectAndClose = useCallback(
         (chip_amount: number) => {
             onChipSelect(chip_amount);
-            trackAnalyticsEvent('ce_trade_types_form_v2', {
-                action: 'customizing_trades',
-                input_method: 'preset',
-                parameter_type: 'stake',
-                preset_value: chip_amount,
-            });
             closePopover();
         },
         [onChipSelect, closePopover]

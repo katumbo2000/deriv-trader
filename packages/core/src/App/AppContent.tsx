@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useMobileBridge, useTrackJS } from '@deriv/api';
+import { useMobileBridge } from '@deriv/api';
 import { observer, useStore } from '@deriv/stores';
 import { ThemeProvider } from '@deriv-com/quill-ui';
 import { getInitialLanguage, useTranslations } from '@deriv-com/translations';
@@ -17,8 +17,6 @@ import Routes from './Containers/Routes/routes.jsx';
 import Devtools from './Devtools';
 
 const AppContent: React.FC<{ passthrough: any }> = observer(({ passthrough }) => {
-    const { initTrackJS } = useTrackJS();
-
     const store = useStore();
     const { current_account } = store.client;
     const { current_language } = store.common;
@@ -37,11 +35,6 @@ const AppContent: React.FC<{ passthrough: any }> = observer(({ passthrough }) =>
     // useIntercom(cs_chat_intercom, token);
 
     const html = document.documentElement;
-
-    React.useEffect(() => {
-        const loginid = current_account?.loginid || undefined;
-        initTrackJS(loginid);
-    }, [initTrackJS, current_account?.loginid]);
 
     React.useEffect(() => {
         switchLanguage(current_language);

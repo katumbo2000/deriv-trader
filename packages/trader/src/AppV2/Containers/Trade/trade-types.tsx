@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { useMobileBridge } from '@deriv/api';
 import { Skeleton } from '@deriv/components';
 import { LabelPairedPresentationScreenSmRegularIcon } from '@deriv/quill-icons';
-import { trackAnalyticsEvent } from '@deriv/shared';
 import { safeParse } from '@deriv/utils';
 import { ActionSheet, Button, Chip, Text } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
@@ -214,9 +213,6 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
     };
 
     const handleCustomizeTradeTypes = () => {
-        trackAnalyticsEvent('ce_trade_types_form_v2', {
-            action: 'customizing_trades',
-        });
         setIsEditing(true);
     };
 
@@ -276,9 +272,6 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
     };
 
     const handleOpenActionSheet = () => {
-        trackAnalyticsEvent('ce_trade_types_form_v2', {
-            action: 'open',
-        });
         setTradeTypes();
         setIsOpen(true);
     };
@@ -363,12 +356,6 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                     onTradeTypeSelect(synthetic_event, 'trade_types_selector', getPinnedItems().length, tab);
                 }}
                 onGuideClick={() => {
-                    const selected = trade_types.find(({ value }) => value === contract_type);
-                    trackAnalyticsEvent('ce_trade_types_form_v2', {
-                        action: 'info_open',
-                        trade_type_name: selected?.text || contract_type,
-                        source: 'trade_types_menu',
-                    });
                     setIsGuideOpen(true);
                     setGuideKey(prev => prev + 1);
                 }}
@@ -431,14 +418,7 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                             pages={action_sheet_content}
                             title={<Localize i18n_default_text='Trade types' />}
                             next_icon={LabelPairedPresentationScreenSmRegularIcon}
-                            onNextButtonClick={() => {
-                                const selected_trade_type = trade_types.find(({ value }) => value === contract_type);
-                                trackAnalyticsEvent('ce_trade_types_form_v2', {
-                                    action: 'info_open',
-                                    trade_type_name: selected_trade_type?.text || contract_type,
-                                    source: 'trade_types_list',
-                                });
-                            }}
+                            onNextButtonClick={() => {}}
                         />
                     )}
                 </ActionSheet.Portal>

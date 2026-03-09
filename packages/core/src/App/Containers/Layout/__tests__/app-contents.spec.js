@@ -41,9 +41,6 @@ describe('<AppContents/>', () => {
         common: {
             platform: 'dtrader',
         },
-        gtm: {
-            pushDataLayer: jest.fn(),
-        },
     };
 
     const store = mockStore(mock);

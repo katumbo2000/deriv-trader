@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { APIProvider } from '@deriv/api';
-import { redirectToLogin, trackAnalyticsEvent } from '@deriv/shared';
+import { redirectToLogin } from '@deriv/shared';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -12,7 +12,6 @@ jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
     getCurrencyDisplayCode: jest.fn((currency: string) => currency),
     redirectToLogin: jest.fn(),
-    trackAnalyticsEvent: jest.fn(),
     getApiCoreBaseUrl: jest.fn(() => 'https://api.deriv.com'),
     addComma: jest.fn((num: number | string, decimals?: number) => {
         const numValue = typeof num === 'string' ? parseFloat(num.replace(/,/g, '')) : num;
@@ -568,122 +567,6 @@ describe('AccountHeader', () => {
             const loginButton = screen.getByRole('button', { name: /log in/i });
             expect(loginButton).toHaveAttribute('type', 'button');
         });
-        describe('Analytics tracking', () => {
-            it('should track analytics event when transfer button is clicked for real account', async () => {
-                renderComponent();
-
-                const transferButton = screen.getByRole('button', { name: /deposit/i });
-                await userEvent.click(transferButton);
-
-                expect(trackAnalyticsEvent).toHaveBeenCalledWith('ce_trade_types_form_v2', {
-                    action: 'click',
-                    button_type: 'deposit',
-                });
-            });
-
-            it('should track analytics event when "Try real" button is clicked for demo-only account', async () => {
-                // Mock useDerivativesAccount to return only demo accounts
-                mockUseDerivativesAccount.mockReturnValue({
-                    data: {
-                        data: [{ account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' }],
-                    },
-                    isLoading: false,
-                    error: null,
-                    refetch: jest.fn(),
-                });
-
-                const demo_store = mockStore({
-                    client: {
-                        balance: '5,000.00',
-                        currency: 'USD',
-                        is_logged_in: true,
-                        is_virtual: true,
-                        logout: jest.fn(),
-                    },
-                    ui: {
-                        toggleTryRealModal: jest.fn(),
-                    },
-                });
-
-                renderComponent(demo_store);
-
-                const tryRealButton = screen.getByRole('button', { name: /try real/i });
-                await userEvent.click(tryRealButton);
-
-                expect(trackAnalyticsEvent).toHaveBeenCalledWith('ce_trade_types_form_v2', {
-                    action: 'click',
-                    button_type: 'try_real',
-                });
-            });
-
-            it('should call trackAnalyticsEvent before navigation for transfer button', async () => {
-                const callOrder: string[] = [];
-
-                (trackAnalyticsEvent as jest.Mock).mockImplementation(() => {
-                    callOrder.push('analytics');
-                });
-
-                // Mock window.location.href setter
-                delete (window as any).location;
-                window.location = { href: '' } as any;
-                Object.defineProperty(window.location, 'href', {
-                    set: jest.fn(() => {
-                        callOrder.push('navigation');
-                    }),
-                    get: jest.fn(),
-                });
-
-                renderComponent();
-
-                const transferButton = screen.getByRole('button', { name: /deposit/i });
-                await userEvent.click(transferButton);
-
-                expect(callOrder).toEqual(['analytics', 'navigation']);
-            });
-
-            it('should call trackAnalyticsEvent before opening modal for "Try real" button', async () => {
-                // Mock useDerivativesAccount to return only demo accounts
-                mockUseDerivativesAccount.mockReturnValue({
-                    data: {
-                        data: [{ account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' }],
-                    },
-                    isLoading: false,
-                    error: null,
-                    refetch: jest.fn(),
-                });
-
-                const callOrder: string[] = [];
-                const toggleTryRealModal = jest.fn(() => {
-                    callOrder.push('modal');
-                });
-
-                (trackAnalyticsEvent as jest.Mock).mockImplementation(() => {
-                    callOrder.push('analytics');
-                });
-
-                const demo_store = mockStore({
-                    client: {
-                        balance: '5,000.00',
-                        currency: 'USD',
-                        is_logged_in: true,
-                        is_virtual: true,
-                        logout: jest.fn(),
-                    },
-                    ui: {
-                        toggleTryRealModal,
-                    },
-                });
-
-                renderComponent(demo_store);
-
-                const tryRealButton = screen.getByRole('button', { name: /try real/i });
-                await userEvent.click(tryRealButton);
-
-                expect(callOrder).toEqual(['analytics', 'modal']);
-                expect(toggleTryRealModal).toHaveBeenCalledWith(true);
-            });
-        });
-
         describe('Demo-only account behavior', () => {
             it('should hide chevron icon for demo-only accounts', () => {
                 // Mock useDerivativesAccount to return only demo accounts

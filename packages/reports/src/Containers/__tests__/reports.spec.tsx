@@ -2,7 +2,6 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory, History } from 'history';
 
-import { trackAnalyticsEvent } from '@deriv/shared';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { TStores } from '@deriv/stores/types';
 import { useDevice } from '@deriv-com/ui';
@@ -20,7 +19,6 @@ jest.mock('@deriv/shared', () => ({
     getSelectedRoute: jest.fn(({ routes, pathname }) => {
         return routes.find((route: { path: string }) => route.path === pathname) || routes[0];
     }),
-    trackAnalyticsEvent: jest.fn(),
 }));
 
 // Mock window.location.href for redirect tests

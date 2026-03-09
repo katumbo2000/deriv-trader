@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useDerivativesAccount, useMobileBridge } from '@deriv/api';
 import { Button, Skeleton, Text } from '@deriv/components';
-import { getBrandUrl, trackAnalyticsEvent } from '@deriv/shared';
+import { getBrandUrl } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { useTranslations } from '@deriv-com/translations';
 
@@ -48,17 +48,8 @@ const AccountActionsComponent = observer(() => {
     // - If only demo accounts exist -> show "Try real"
     // - Otherwise (real only or both real and demo) -> show "Deposit"
     const buttonLabel = hasOnlyDemoAccounts ? localize('Try real') : localize('Deposit');
-    const buttonType = hasOnlyDemoAccounts ? 'try_real' : 'deposit';
 
     const handleTransferClick = () => {
-        // Track analytics event
-        const eventName = 'ce_trade_types_form_v2';
-
-        trackAnalyticsEvent(eventName, {
-            action: 'click',
-            button_type: buttonType,
-        });
-
         if (hasOnlyDemoAccounts) {
             // Show modal instead of redirecting directly
             ui.toggleTryRealModal(true);

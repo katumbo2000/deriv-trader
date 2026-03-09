@@ -9,8 +9,6 @@ labelPRBasedOnFilePath:
     - packages/shared/**/*
   Trader:
     - packages/trader/**/*
-  Translations:
-    - packages/translations/**/*
   Docs:
     - README.md
     - docs/**/*.md

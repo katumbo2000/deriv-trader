@@ -67,7 +67,6 @@ module.exports = function (env) {
                 '@deriv/components': '@deriv/components',
                 '@deriv-com/translations': '@deriv-com/translations',
                 '@deriv-com/smartcharts-champion': '@deriv-com/smartcharts-champion',
-                '@deriv-com/analytics': '@deriv-com/analytics',
                 moment: 'moment',
                 dayjs: 'dayjs',
             },

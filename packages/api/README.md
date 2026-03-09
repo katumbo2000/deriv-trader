@@ -13,7 +13,6 @@ This package provides a set of React hooks and utilities for making API calls to
 - **WebSocket Support**: Real-time data subscriptions via WebSocket connections
 - **Caching**: Intelligent caching and background refetching
 - **Error Handling**: Comprehensive error handling and retry mechanisms
-- **Analytics Integration**: Built-in analytics tracking with `@deriv-com/analytics`
 - **Feature Flags**: Support for feature flag management
 - **Internationalization**: i18n support with `react-i18next`
 
@@ -237,29 +236,6 @@ function ConditionalFeature() {
 }
 ```
 
-#### useTrackJS
-
-For error tracking and analytics:
-
-```tsx
-import { useTrackJS } from '@deriv/api';
-
-function MyComponent() {
-    const { trackError, trackEvent } = useTrackJS();
-
-    const handleAction = () => {
-        try {
-            // Some action
-            trackEvent('user_action', { action: 'button_click' });
-        } catch (error) {
-            trackError(error);
-        }
-    };
-
-    return <button onClick={handleAction}>Action</button>;
-}
-```
-
 ## API Reference
 
 ### Core Hooks
@@ -274,15 +250,14 @@ function MyComponent() {
 
 ### Utility Hooks
 
-| Hook                  | Description                  | Parameters             | Returns               |
-| --------------------- | ---------------------------- | ---------------------- | --------------------- |
-| `useInvalidateQuery`  | Invalidate cached queries    | `()`                   | `(queryKey) => void`  |
-| `useRemoteConfig`     | Access remote configuration  | `()`                   | `QueryResult<Config>` |
-| `useFeatureFlags`     | Feature flag management      | `()`                   | `FeatureFlagsResult`  |
-| `useTrackJS`          | Error tracking and analytics | `()`                   | `TrackingMethods`     |
-| `useIntercom`         | Intercom integration         | `()`                   | `IntercomMethods`     |
-| `useIsRtl`            | RTL language detection       | `()`                   | `boolean`             |
-| `useLocalStorageData` | Local storage utilities      | `(key, defaultValue?)` | `[value, setValue]`   |
+| Hook                  | Description                 | Parameters             | Returns               |
+| --------------------- | --------------------------- | ---------------------- | --------------------- |
+| `useInvalidateQuery`  | Invalidate cached queries   | `()`                   | `(queryKey) => void`  |
+| `useRemoteConfig`     | Access remote configuration | `()`                   | `QueryResult<Config>` |
+| `useFeatureFlags`     | Feature flag management     | `()`                   | `FeatureFlagsResult`  |
+| `useIntercom`         | Intercom integration        | `()`                   | `IntercomMethods`     |
+| `useIsRtl`            | RTL language detection      | `()`                   | `boolean`             |
+| `useLocalStorageData` | Local storage utilities     | `(key, defaultValue?)` | `[value, setValue]`   |
 
 ## Dependencies
 
@@ -290,7 +265,6 @@ function MyComponent() {
 
 - `@tanstack/react-query`: ^4.28.0 - Data fetching and caching
 - `@deriv/deriv-api`: ^1.0.15 - Deriv API client
-- `@deriv-com/analytics`: 1.31.6 - Analytics tracking
 - `@deriv-com/ui`: 1.36.4 - UI components
 - `react`: ^17.0.2 - React framework
 - `react-i18next`: ^11.11.0 - Internationalization

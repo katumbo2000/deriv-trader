@@ -53,7 +53,6 @@ import {
     setLimitOrderBarriers,
     setTradeURLParams,
     showUnavailableLocationError,
-    trackAnalyticsEvent,
     TRADE_TYPES,
     WS,
 } from '@deriv/shared';
@@ -189,10 +188,6 @@ export type TV2ParamsInitialValues = {
     barrier_1?: number;
     payout_per_point?: string;
 };
-type TContractDataForGTM = Omit<Partial<TPriceProposalRequest>, 'cancellation' | 'limit_order'> &
-    ReturnType<typeof getProposalInfo> & {
-        buy_price: number;
-    };
 type TPrevChartLayout =
     | (TChartLayout & {
           isDone?: VoidFunction;
@@ -554,7 +549,6 @@ export default class TradeStore extends BaseStore {
             prepareTradeStore: action.bound,
             preSwitchAccountListener: action.bound,
             processPurchase: action.bound,
-            pushPurchaseDataToGtm: action.bound,
             refresh: action.bound,
             requestProposal: action.bound,
             resetAccumulatorData: action.bound,
@@ -1219,11 +1213,6 @@ export default class TradeStore extends BaseStore {
                         // Clear open positions filter from session storage when a new contract is purchased
                         sessionStorage.removeItem('open_positions_filter');
 
-                        const contract_data: TContractDataForGTM = {
-                            ...this.proposal_requests[type],
-                            ...this.proposal_info[type],
-                            buy_price: response.buy.buy_price,
-                        };
                         const { contract_id, longcode, start_time } = response.buy;
 
                         // toggle smartcharts to contract mode
@@ -1279,14 +1268,6 @@ export default class TradeStore extends BaseStore {
                                 const market_type_name = getMarketName(this.symbol) || this.symbol;
                                 // For contract_type, we use the specific contract type (like 'ONETOUCH' -> 'Touch')
                                 const contract_type_display = getTradeTypeName(contract_type) || '';
-
-                                trackAnalyticsEvent('ce_contracts_set_up_form_v2', {
-                                    action: 'run_contract',
-                                    trade_type_name,
-                                    market_type_name,
-                                    contract_id,
-                                    contract_type: contract_type_display,
-                                });
                             }
 
                             if (!isMobile) {
@@ -1298,7 +1279,6 @@ export default class TradeStore extends BaseStore {
                             this.proposal_requests = {};
                             this.debouncedProposal();
                             this.clearLimitOrderBarriers();
-                            this.pushPurchaseDataToGtm(contract_data);
                             if (this.root_store.ui.is_mobile) {
                                 const shortcode = response.buy.shortcode;
                                 const extracted_info_from_shortcode = extractInfoFromShortcode(shortcode);
@@ -1607,38 +1587,6 @@ export default class TradeStore extends BaseStore {
 
     setMobileDigitView(bool: boolean) {
         this.is_mobile_digit_view_selected = bool;
-    }
-
-    pushPurchaseDataToGtm(contract_data: TContractDataForGTM) {
-        const data = {
-            event: 'buy_contract',
-            bom_ui: 'new',
-            contract: {
-                amount: contract_data.amount,
-                barrier1: contract_data.barrier,
-                barrier2: contract_data.barrier2,
-                basis: contract_data.basis,
-                buy_price: contract_data.buy_price,
-                contract_type: contract_data.contract_type,
-                currency: contract_data.currency,
-                date_expiry: contract_data.date_expiry,
-                duration: contract_data.duration,
-                duration_unit: contract_data.duration_unit,
-                payout: contract_data.payout,
-                symbol: contract_data.underlying_symbol,
-            },
-            settings: {
-                theme: this.root_store.ui.is_dark_mode_on ? 'dark' : 'light',
-                positions_drawer: this.root_store.ui.active_sidebar_flyout ? 'open' : 'closed',
-                chart: {
-                    toolbar_position: this.root_store.ui.is_chart_layout_default ? 'bottom' : 'left',
-                    chart_asset_info: this.root_store.ui.is_chart_asset_info_visible ? 'visible' : 'hidden',
-                    chart_type: this.root_store.contract_trade.chart_type,
-                    granularity: this.root_store.contract_trade.granularity,
-                },
-            },
-        };
-        this.root_store.gtm.pushDataLayer(data);
     }
 
     clearPurchaseInfo() {
@@ -2247,14 +2195,6 @@ export default class TradeStore extends BaseStore {
             if (option?.chart_type_name) {
                 this.root_store.contract_trade.updateChartType(option?.chart_type_name);
             }
-        }
-        const { data, event_type } = getChartAnalyticsData(state as keyof typeof STATE_TYPES, option) as TPayload;
-        if (data) {
-            trackAnalyticsEvent(event_type, {
-                ...data,
-                action: data.action,
-                platform: 'DTrader',
-            });
         }
     }
 

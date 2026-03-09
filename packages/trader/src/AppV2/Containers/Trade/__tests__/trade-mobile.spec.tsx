@@ -11,8 +11,6 @@ import ModulesProvider from 'Stores/Providers/modules-providers';
 import TraderProviders from '../../../../trader-providers';
 import TradeMobile from '../trade-mobile';
 
-// Mock trackAnalyticsEvent
-const mockTrackAnalyticsEvent = jest.fn();
 jest.mock('@deriv/shared', () => ({
     ...jest.requireActual('@deriv/shared'),
     getSymbolDisplayName: jest.fn(symbol => `${symbol} Display Name`),
@@ -20,7 +18,6 @@ jest.mock('@deriv/shared', () => ({
     redirectToSignUp: jest.fn(),
     getBrandUrl: jest.fn(() => 'https://deriv.com'),
     isEmptyObject: jest.fn(obj => !obj || Object.keys(obj).length === 0),
-    trackAnalyticsEvent: (...args: any[]) => mockTrackAnalyticsEvent(...args),
 }));
 
 // Mock all external dependencies

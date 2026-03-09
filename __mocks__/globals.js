@@ -3,16 +3,6 @@ jest.mock('copy-anything', () => ({
     copy: jest.fn(),
 }));
 
-jest.mock('@deriv-com/analytics', () => ({
-    Analytics: {
-        trackEvent: jest.fn(),
-        pageView: jest.fn(),
-        reset: jest.fn(),
-        setAttributes: jest.fn(),
-        getFeatureValue: jest.fn(),
-    },
-}));
-
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: jest.fn().mockImplementation(query => ({

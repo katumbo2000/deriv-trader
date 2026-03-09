@@ -6,7 +6,6 @@ import { APIProvider, useMobileBridge } from '@deriv/api';
 import { Loading } from '@deriv/components';
 import { initFormErrorMessages, setUrlLanguage, setWebsocket } from '@deriv/shared';
 import { StoreProvider } from '@deriv/stores';
-import { Analytics } from '@deriv-com/analytics';
 import { BreakpointProvider } from '@deriv-com/quill-ui';
 import { getInitialLanguage, initializeI18n, TranslationProvider } from '@deriv-com/translations';
 
@@ -70,12 +69,6 @@ const App = ({ root_store }) => {
     };
 
     setWebsocket(WS);
-
-    React.useEffect(() => {
-        if (!root_store.client.email) {
-            Analytics.reset();
-        }
-    }, [root_store.client.email]);
 
     React.useEffect(() => {
         const html = document?.querySelector('html');

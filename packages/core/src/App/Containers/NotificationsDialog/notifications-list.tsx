@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 import { Button, Text } from '@deriv/components';
-import { isEmptyObject, toTitleCase, trackAnalyticsEvent } from '@deriv/shared';
+import { isEmptyObject, toTitleCase } from '@deriv/shared';
 import { icon_types } from 'App/Components/Elements/NotificationMessage/constants';
 import { observer, useStore } from '@deriv/stores';
 import { BinaryLink } from 'App/Components/Routes';
@@ -50,12 +50,7 @@ const NotificationsList = observer(() => {
         }
     };
 
-    const onActionTrackEvent = (key: string) => {
-        trackAnalyticsEvent('ce_notification_form_v2', {
-            action: 'click_cta',
-            platform: 'DTrader',
-        });
-    };
+    const onActionTrackEvent = (_key: string) => {};
     const filtered_notifications = notifications_array.filter(item => !item.only_toast_message);
     return (
         <React.Fragment>

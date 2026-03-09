@@ -684,23 +684,6 @@ type TContractReplay = {
     onUnmount: () => void;
     removeErrorMessage: () => void;
 };
-type TGtmStore = {
-    is_gtm_applicable: boolean;
-    visitorId: Readonly<string>;
-    common_variables: Readonly<{
-        language: string;
-        visitorId?: string;
-        currency?: string;
-        userId?: string;
-        email?: string;
-        loggedIn: boolean;
-        theme: 'dark' | 'light';
-        platform: 'DBot' | 'MT5' | 'DTrader' | 'undefined';
-    }>;
-    pushDataLayer: (data: Record<string, unknown>) => void;
-    pushTransactionData: (response: Transaction, extra_data: Record<string, unknown>) => void;
-};
-
 /**
  * This is the type that contains all the `core` package stores
  */
@@ -714,7 +697,6 @@ export type TCoreStores = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     modules: Record<string, any>;
     notifications: TNotificationStore;
-    gtm: TGtmStore;
     contract_replay: TContractReplay;
     chart_barrier_store: TBarriers[number];
     active_symbols: TActiveSymbolsStore;

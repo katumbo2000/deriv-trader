@@ -105,7 +105,6 @@ jest.mock('@deriv/shared', () => ({
     hasContractEntered: jest.fn(),
     isForwardStarting: jest.fn(),
     isAccumulatorContract: jest.fn(),
-    trackAnalyticsEvent: jest.fn(),
     WS: {
         contractUpdateHistory: jest.fn(() => Promise.resolve({ contract_update_history: [] })),
     },

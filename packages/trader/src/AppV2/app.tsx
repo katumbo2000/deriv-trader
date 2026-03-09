@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { ReportsStoreProvider } from '@deriv/reports/src/Stores/useReportsStores';
-import { trackAnalyticsEvent } from '@deriv/shared';
 import type { TCoreStores } from '@deriv/stores/types';
 import { NotificationsProvider, SnackbarProvider } from '@deriv-com/quill-ui';
 
@@ -39,10 +38,6 @@ const App = ({ passthrough }: Apptypes) => {
         }
 
         analyticsCalledRef.current = true;
-
-        trackAnalyticsEvent('ce_dtrader_app_v2', {
-            action: 'open',
-        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

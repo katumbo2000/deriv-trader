@@ -1,4 +1,4 @@
-import { getPlatformName, getPlatformLogo, routes } from '@deriv/shared';
+import { getPlatformName, getPlatformDescription, getPlatformLogo, routes } from '@deriv/shared';
 import { localize } from '@deriv-com/translations';
 
 type TPlatformConfig = {
@@ -16,7 +16,11 @@ const platform_config: TPlatformConfig[] = [
         icon: getPlatformLogo(),
         title: () => getPlatformName(),
         name: getPlatformName(),
-        description: () => localize('A whole new trading experience on a powerful yet easy to use platform.'),
+        // [AI]
+        description: () =>
+            getPlatformDescription() ||
+            localize('A whole new trading experience on a powerful yet easy to use platform.'),
+        // [/AI]
         link_to: routes.index,
     },
 ];
