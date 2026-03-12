@@ -16,13 +16,13 @@ export const getBrandLogo = () => {
 
 /**
  * Runtime production check based on window.location.hostname.
+ * Matches against the configured brand_hostname.production value.
  */
 export const isProduction = (): boolean => {
     if (typeof window === 'undefined') return false;
     const hostname = window.location.hostname;
-    const domain = getBrandDomain();
-    const pattern = new RegExp(`^(www\\.)?(beta-)?dtrader\\.${domain.replaceAll('.', '\\.')}$`, 'i');
-    return pattern.test(hostname);
+    const production_hostname = config_data.brand_hostname.production;
+    return hostname === production_hostname;
 };
 
 export const getBrandHostname = () => {
