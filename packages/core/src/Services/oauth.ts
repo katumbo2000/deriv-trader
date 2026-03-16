@@ -98,9 +98,14 @@ export const exchangeCodeForToken = async (
     if (!response.ok) throw new Error(`Token exchange failed: ${response.status}`);
 
     const data = await response.json();
-
-    // eslint-disable-next-line no-console
-    console.log('Token exchange response:', data);
+    if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[OAuth] Token exchange response:', {
+            scope: data.scope,
+            token_type: data.token_type,
+            expires_in: data.expires_in,
+        });
+    }
     if (!data.access_token)
         throw new Error(`Token exchange succeeded but no access_token in response: ${JSON.stringify(data)}`);
     clearPKCEVerifier();

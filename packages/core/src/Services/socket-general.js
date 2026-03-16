@@ -134,6 +134,13 @@ const BinarySocketGeneral = (() => {
 
         // If response is balance format, transform to authorize format
         if (response.balance && !response.authorize) {
+            // The v4 balance response only contains financial fields.
+            // Fall back to active_loginid as user_id so active_user_id is never empty.
+            const fallback_user_id =
+                response.balance.user_id ||
+                sessionStorage.getItem('active_loginid') ||
+                localStorage.getItem('active_loginid') ||
+                '';
             authorize_data = {
                 authorize: {
                     loginid: response.balance.loginid,
@@ -142,7 +149,7 @@ const BinarySocketGeneral = (() => {
                     email: response.balance.email || '',
                     landing_company_name: response.balance.landing_company_name || '',
                     country: response.balance.country || '',
-                    user_id: response.balance.user_id || '',
+                    user_id: fallback_user_id,
                     preferred_language: response.balance.preferred_language || '',
                 },
             };
