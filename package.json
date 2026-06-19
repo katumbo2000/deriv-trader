@@ -141,7 +141,7 @@
         "test:ci": "npm run test:stylelint && npm run test:eslint-all && npm run test:jest",
         "stylelint:fix": "stylelint \"./packages/*/src/**/*.s(a|c)ss\" --fix",
         "prettify": "prettier --config ./.prettierrc --write \"./packages/*/{stories,script,src,build}/**/*.{js,jsx,ts,tsx,scss}\"",
-        "prepare": "husky install"
+        "prepare": "node -e \"if(require('fs').existsSync('.git')){require('child_process').execSync('husky install',{stdio:'inherit'})\}"
     },
     "dependencies": {
         "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
