@@ -48,3 +48,5 @@ cline_instructions.md
 .ai-rules.md
 .shiftai-commit-data.json
 .vercel
+
+deploy_dist/
