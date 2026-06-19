@@ -57,4 +57,4 @@ function requestToKey(request) {
     return JSON.stringify(request_copy);
 }
 
-module.exports = APIMiddleware;
+export default APIMiddleware;

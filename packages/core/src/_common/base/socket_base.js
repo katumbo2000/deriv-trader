@@ -1,7 +1,7 @@
-const DerivAPIBasic = require('@deriv/deriv-api/dist/DerivAPIBasic');
-const { getAccountType, cloneObject, State, getApiV4BaseUrl } = require('@deriv/shared');
-const SocketCache = require('./socket_cache');
-const APIMiddleware = require('./api_middleware');
+import DerivAPIBasic from '@deriv/deriv-api/dist/DerivAPIBasic';
+import { getAccountType, cloneObject, State, getApiV4BaseUrl } from '@deriv/shared';
+import SocketCache from './socket_cache';
+import APIMiddleware from './api_middleware';
 
 /*
  * An abstraction layer over native javascript WebSocket,
@@ -573,4 +573,4 @@ const proxyForAuthorize = obj =>
 
 BinarySocketBase.authorized = proxyForAuthorize(proxied_socket_base);
 
-module.exports = proxied_socket_base;
+export default proxied_socket_base;

@@ -1,5 +1,5 @@
-const { localize } = require('@deriv-com/translations');
-const BinarySocket = require('./socket_base');
+import { localize } from '@deriv-com/translations';
+import BinarySocket from './socket_base';
 
 /*
  * Monitors the network status and initialises the WebSocket connection
@@ -97,4 +97,4 @@ const NetworkMonitorBase = (() => {
     };
 })();
 
-module.exports = NetworkMonitorBase;
+export default NetworkMonitorBase;
