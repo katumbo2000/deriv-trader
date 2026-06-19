@@ -20,9 +20,9 @@ module.exports = function (env) {
                 target: sub_path,
             },
             host: 'localhost',
-            server: 'https',
+            server: 'http',
 
-            port: 8443,
+            port: 8444,
             historyApiFallback: true,
             hot: false,
             client: {
