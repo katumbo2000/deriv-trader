@@ -26,8 +26,8 @@
         "staging": "https://staging-auth.deriv.com",
         "production": "https://auth.deriv.com",
         "oauth_scopes": ["trade", "account_manage"],
-        "oauth_redirect_uri_staging": "https://deriv-trader-eight.vercel.app",
-        "oauth_redirect_uri_production": "https://deriv-trader-eight.vercel.app",
+        "oauth_redirect_uri_staging": "https://deriv-trader-eight.vercel.app/",
+        "oauth_redirect_uri_production": "https://deriv-trader-eight.vercel.app/",
         "oauth_app_id": "33B19b2wD2aRY4SeGRjNq"
     },
     "derivws": {
